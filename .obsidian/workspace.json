@@ -78,7 +78,7 @@
       }
     ],
     "direction": "horizontal",
-    "width": 300
+    "width": 223.5
   },
   "right": {
     "id": "38b78410ed842a52",
@@ -185,8 +185,9 @@
   },
   "active": "7998ccb99b6dbf91",
   "lastOpenFiles": [
-    "docs/08-build-packaging.md",
+    "README.md",
     "docs/PROMPT.md",
+    "docs/08-build-packaging.md",
     "docs/PROMPT.md.tmp.18087.d0d722f589a0",
     "docs/10-repo-layout.md",
     "docs/10-repo-layout.md.tmp.18087.ae79312d4ef6",
@@ -203,7 +204,6 @@
     "docs/01-architecture.md",
     "docs/04-qml-api.md.tmp.18087.ea68813e3dde",
     "docs/00-overview.md",
-    "README.md",
     "docs/03-core-backend.md",
     "docs/03-core-backend.md.tmp.18087.63f84fbf0969"
   ]

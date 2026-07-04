@@ -1,0 +1,16 @@
+# Fang — LLVM base, 4-space indent, 100 columns (see docs/02-tech-stack.md)
+BasedOnStyle: LLVM
+Language: Cpp
+Standard: c++20
+IndentWidth: 4
+ColumnLimit: 100
+AccessModifierOffset: -4
+PointerAlignment: Left
+AllowShortFunctionsOnASingleLine: Inline
+BreakBeforeBraces: Attach
+IncludeBlocks: Preserve
+SortIncludes: CaseSensitive
+SpaceAfterTemplateKeyword: true
+IndentCaseLabels: false
+NamespaceIndentation: None
+FixNamespaceComments: true

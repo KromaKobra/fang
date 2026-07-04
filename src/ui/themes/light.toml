@@ -1,0 +1,44 @@
+schema_version = 1
+name = "light"
+is_dark = false
+
+[colors]
+background           = "#eff1f5"
+background_alt       = "#e6e9ef"
+surface              = "#dce0e8"
+surface_hover        = "#ccd0da"
+surface_active       = "#bcc0cc"
+foreground           = "#4c4f69"
+foreground_muted     = "#6c6f85"
+accent               = "#1e66f5"
+accent_foreground    = "#eff1f5"
+border               = "#ccd0da"
+selection_background = "#acb0be"
+selection_foreground = "#4c4f69"
+error                = "#d20f39"
+warning              = "#df8e1d"
+success              = "#40a02b"
+shadow               = "#00000033"
+scrollbar            = "#bcc0cc"
+scrollbar_hover      = "#acb0be"
+
+[metrics]
+radius_small = 4
+radius_medium = 8
+radius_large = 12
+spacing_small = 4
+spacing_medium = 8
+spacing_large = 16
+row_height = 28
+toolbar_height = 40
+sidebar_width = 220
+icon_size_small = 16
+icon_size_medium = 24
+icon_size_large = 48
+
+[typography]
+font_family       = "Inter, sans-serif"
+font_family_mono  = "JetBrains Mono, monospace"
+font_size_small   = 9
+font_size_normal  = 10
+font_size_large   = 13

@@ -1,0 +1,10 @@
+build/
+build-*/
+.cache/
+compile_commands.json
+.direnv/
+result
+result-*
+flake.lock
+CMakeLists.txt.user
+*.user

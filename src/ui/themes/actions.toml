@@ -1,0 +1,39 @@
+# Fang bundled default actions. A user entry in
+# $XDG_CONFIG_HOME/fang/actions.toml with the same id overrides these;
+# show_in_menu = false disables one.
+schema_version = 1
+
+[[action]]
+id              = "open-terminal-here"
+label           = "Open Terminal Here"
+icon            = "utilities-terminal"
+command         = "sh -c 'cd %d && exec \"${SHELL:-sh}\"'"
+applies_to      = "background"
+run_in_terminal = true
+show_in_menu    = true
+
+[[action]]
+id            = "compress-zip"
+label         = "Compress to ZIP"
+icon          = "package-x-generic"
+command       = "sh -c 'cd %d && zip -r archive.zip %F'"
+applies_to    = "files"
+min_selection = 1
+
+[[action]]
+id            = "extract-here"
+label         = "Extract Here"
+icon          = "archive-extract"
+command       = "sh -c 'cd %d && tar xf %f || unzip %f'"
+applies_to    = "files"
+extensions    = ["zip", "tar", "gz", "xz", "bz2", "zst", "tgz", "7z"]
+max_selection = 1
+
+[[action]]
+id          = "open-with-editor"
+label       = "Open in Text Editor"
+icon        = "accessories-text-editor"
+command     = "xdg-open %f"
+applies_to  = "files"
+mime_types  = ["text/*"]
+max_selection = 1

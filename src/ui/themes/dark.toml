@@ -1,0 +1,44 @@
+schema_version = 1
+name = "dark"
+is_dark = true
+
+[colors]
+background           = "#1e1e2e"
+background_alt       = "#181825"
+surface              = "#252537"
+surface_hover        = "#313145"
+surface_active       = "#3a3a52"
+foreground           = "#cdd6f4"
+foreground_muted     = "#9399b2"
+accent               = "#89b4fa"
+accent_foreground    = "#11111b"
+border               = "#313244"
+selection_background = "#45475a"
+selection_foreground = "#cdd6f4"
+error                = "#f38ba8"
+warning              = "#f9e2af"
+success              = "#a6e3a1"
+shadow               = "#00000066"
+scrollbar            = "#45475a"
+scrollbar_hover      = "#585b70"
+
+[metrics]
+radius_small = 4
+radius_medium = 8
+radius_large = 12
+spacing_small = 4
+spacing_medium = 8
+spacing_large = 16
+row_height = 28
+toolbar_height = 40
+sidebar_width = 220
+icon_size_small = 16
+icon_size_medium = 24
+icon_size_large = 48
+
+[typography]
+font_family       = "Inter, sans-serif"
+font_family_mono  = "JetBrains Mono, monospace"
+font_size_small   = 9
+font_size_normal  = 10
+font_size_large   = 13
