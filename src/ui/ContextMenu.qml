@@ -2,8 +2,7 @@ import QtQuick
 import Fang
 import "controls" as C
 
-// File/background context menus (docs/05). Clipboard/trash/actions items
-// join in stages 4 and 8.
+// File/background context menus (docs/05). Custom actions join in stage 8.
 Item {
     id: root
     property PaneController pane: null
@@ -12,6 +11,9 @@ Item {
 
     readonly property var sel: pane ? pane.selection : null
     readonly property bool single: sel ? sel.count === 1 : false
+    readonly property bool singleDir:
+        single && pane && sel.current >= 0 && pane.model.isDirAt(sel.current)
+    readonly property bool clipboardHasFiles: Application.clipboard.hasFiles
 
     function popupFile(sceneX, sceneY) {
         menuState = "file"
@@ -46,14 +48,65 @@ Item {
         }
         C.Separator { visible: root.menuState === "file" }
         C.MenuItem {
+            visible: root.menuState === "file"
+            text: "Cut"
+            shortcut: "Ctrl+X"
+            icon: "edit-cut"
+            onTriggered: root.fileView.cutSelection()
+        }
+        C.MenuItem {
+            visible: root.menuState === "file"
+            text: "Copy"
+            shortcut: "Ctrl+C"
+            icon: "edit-copy"
+            onTriggered: root.fileView.copySelection()
+        }
+        C.MenuItem {
+            visible: root.menuState === "file"
+            text: "Copy Path"
+            onTriggered: Application.clipboard.copyPaths(root.sel.selectedUrls)
+        }
+        C.MenuItem {
+            visible: root.menuState === "file" && root.singleDir
+            enabled: root.clipboardHasFiles
+            text: "Paste Into Folder"
+            icon: "edit-paste"
+            onTriggered: Application.clipboard.paste(
+                "file://" + root.pane.model.pathAt(root.sel.current))
+        }
+        C.Separator { visible: root.menuState === "file" }
+        C.MenuItem {
             visible: root.menuState === "file" && root.single
             text: "Rename"
             shortcut: "F2"
             icon: "edit-rename"
             onTriggered: root.fileView.startRenameCurrent()
         }
+        C.MenuItem {
+            visible: root.menuState === "file"
+            text: "Move to Trash"
+            shortcut: "Del"
+            icon: "user-trash"
+            onTriggered: root.fileView.trashSelection()
+        }
+        C.MenuItem {
+            visible: root.menuState === "file"
+            text: "Delete Permanently"
+            shortcut: "Shift+Del"
+            icon: "edit-delete"
+            onTriggered: root.fileView.requestDeletePermanently()
+        }
 
         // ---- background items
+        C.MenuItem {
+            visible: root.menuState === "background"
+            enabled: root.clipboardHasFiles
+            text: "Paste"
+            shortcut: "Ctrl+V"
+            icon: "edit-paste"
+            onTriggered: root.fileView.pasteHere()
+        }
+        C.Separator { visible: root.menuState === "background" }
         C.MenuItem {
             visible: root.menuState === "background"
             text: "New Folder"

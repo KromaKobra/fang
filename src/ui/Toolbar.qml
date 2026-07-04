@@ -112,6 +112,21 @@ Rectangle {
         }
         C.Separator {}
         C.MenuItem {
+            text: Application.undo.canUndo ? Application.undo.undoText : "Undo"
+            shortcut: "Ctrl+Z"
+            icon: "edit-undo"
+            enabled: Application.undo.canUndo
+            onTriggered: Application.undo.undo()
+        }
+        C.MenuItem {
+            text: Application.undo.canRedo ? Application.undo.redoText : "Redo"
+            shortcut: "Ctrl+Shift+Z"
+            icon: "edit-redo"
+            enabled: Application.undo.canRedo
+            onTriggered: Application.undo.redo()
+        }
+        C.Separator {}
+        C.MenuItem {
             text: "Toggle Split View"
             shortcut: "F3"
             icon: "view-split-left-right"

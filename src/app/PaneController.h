@@ -10,10 +10,12 @@
 Q_MOC_INCLUDE("fs/DirectoryModel.h")
 Q_MOC_INCLUDE("nav/Navigation.h")
 Q_MOC_INCLUDE("nav/Selection.h")
+Q_MOC_INCLUDE("ops/FileOperationEngine.h")
 
 namespace fang {
 
 class DirectoryModel;
+class FileOperations;
 class Navigation;
 class Selection;
 class WindowController;
@@ -29,6 +31,7 @@ class PaneController : public QObject {
     Q_PROPERTY(fang::DirectoryModel* model READ model CONSTANT)
     Q_PROPERTY(fang::Navigation* navigation READ navigation CONSTANT)
     Q_PROPERTY(fang::Selection* selection READ selection CONSTANT)
+    Q_PROPERTY(fang::FileOperations* fileOperations READ fileOperations CONSTANT)
     Q_PROPERTY(fang::ViewMode viewMode READ viewMode WRITE setViewMode NOTIFY viewModeChanged)
     Q_PROPERTY(fang::SortRole sortRole READ sortRole WRITE setSortRole NOTIFY sortChanged)
     Q_PROPERTY(bool sortDescending READ sortDescending WRITE setSortDescending NOTIFY sortChanged)
@@ -53,6 +56,7 @@ public:
     DirectoryModel* model() const { return m_model; }
     Navigation* navigation() const { return m_navigation; }
     Selection* selection() const { return m_selection; }
+    FileOperations* fileOperations() const { return m_fileOperations; }
 
     ViewMode viewMode() const { return m_viewMode; }
     void setViewMode(ViewMode mode);
@@ -120,6 +124,7 @@ private:
     DirectoryModel* m_model;
     Navigation* m_navigation;
     Selection* m_selection;
+    FileOperations* m_fileOperations;
 
     QString m_location;
     ViewMode m_viewMode = ViewMode::Details;

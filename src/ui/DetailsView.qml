@@ -156,6 +156,8 @@ Item {
             row: index
             filePath: model.path
             fileName: model.name
+            fileUrl: model.url
+            isDir: model.isDir
             selected: model.selected
             width: list.width
             height: root.th.rowHeight

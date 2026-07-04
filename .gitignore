@@ -8,3 +8,4 @@ result-*
 flake.lock
 CMakeLists.txt.user
 *.user
+.obsidian/

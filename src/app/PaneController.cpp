@@ -6,6 +6,8 @@
 #include "fs/MimeResolver.h"
 #include "nav/Navigation.h"
 #include "nav/Selection.h"
+#include "ops/FileOperationEngine.h"
+#include "ops/Operation.h"
 #include "util/Logging.h"
 
 #include <QDir>
@@ -24,6 +26,7 @@ PaneController::PaneController(WindowController* window, QObject* parent)
     m_navigation = new Navigation(this);
     m_selection = new Selection(m_model, this);
     m_model->setSelection(m_selection);
+    m_fileOperations = new FileOperations(this);
 
     m_columnWidths.insert(QStringLiteral("name"), 320);
     m_columnWidths.insert(QStringLiteral("size"), 90);
@@ -269,29 +272,17 @@ qint64 PaneController::totalSize() const
 
 // ------------------------------------------------------- mutating helpers
 
+// Creation and rename go through the engine so they land on the undo stack;
+// the engine notifies the user on failure.
+
 void PaneController::createFolder(const QString& name)
 {
-    if (name.isEmpty() || name.contains(QLatin1Char('/'))) {
-        emit error(tr("Invalid folder name"), name);
-        return;
-    }
-    if (!QDir(m_location).mkdir(name))
-        emit error(tr("Could not create folder"), m_location + QLatin1Char('/') + name);
+    FileOperationEngine::instance()->createFolder(QUrl::fromLocalFile(m_location), name);
 }
 
 void PaneController::createFile(const QString& name)
 {
-    if (name.isEmpty() || name.contains(QLatin1Char('/'))) {
-        emit error(tr("Invalid file name"), name);
-        return;
-    }
-    QFile f(m_location + QLatin1Char('/') + name);
-    if (f.exists()) {
-        emit error(tr("File already exists"), f.fileName());
-        return;
-    }
-    if (!f.open(QIODevice::WriteOnly))
-        emit error(tr("Could not create file"), f.fileName());
+    FileOperationEngine::instance()->createFile(QUrl::fromLocalFile(m_location), name);
 }
 
 void PaneController::renameAt(int row, const QString& newName)
@@ -299,17 +290,7 @@ void PaneController::renameAt(int row, const QString& newName)
     const FileInfo* fi = m_model->infoAt(row);
     if (!fi)
         return;
-    if (newName.isEmpty() || newName.contains(QLatin1Char('/'))) {
-        emit error(tr("Invalid name"), newName);
-        return;
-    }
-    const QString dest = QFileInfo(fi->path).absolutePath() + QLatin1Char('/') + newName;
-    if (QFileInfo::exists(dest)) {
-        emit error(tr("Name already in use"), newName);
-        return;
-    }
-    if (!QFile::rename(fi->path, dest))
-        emit error(tr("Could not rename"), fi->path);
+    FileOperationEngine::instance()->rename(QUrl::fromLocalFile(fi->path), newName);
 }
 
 } // namespace fang

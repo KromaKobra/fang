@@ -60,6 +60,8 @@ Item {
             row: index
             filePath: model.path
             fileName: model.name
+            fileUrl: model.url
+            isDir: model.isDir
             selected: model.selected
             width: grid.cellWidth - 6
             height: grid.cellHeight - 6

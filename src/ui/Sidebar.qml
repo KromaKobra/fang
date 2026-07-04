@@ -88,12 +88,34 @@ Rectangle {
                 model: wrapper.model
                 current: root.pane && root.pane.location === wrapper.model.url
                          && wrapper.model.url !== ""
+                dropHover: placeDrop.containsDrag
                 onClicked: root.openPlace(wrapper.model)
                 onMiddleClicked: if (wrapper.model.isMounted)
                                      root.win.addTab(wrapper.model.url)
                 onRightClicked: function(sceneX, sceneY) {
                     placeMenu.placeModel = wrapper.model
                     placeMenu.popup(sceneX, sceneY)
+                }
+            }
+
+            // Drop files onto a place: transfer there; onto Trash: trash them.
+            DropArea {
+                id: placeDrop
+                anchors.fill: parent
+                keys: ["text/uri-list"]
+                enabled: !wrapper.collapsed && wrapper.model.isMounted
+                         && wrapper.model.url !== ""
+                onDropped: function(drop) {
+                    if (!drop.urls || drop.urls.length === 0 || !root.pane)
+                        return
+                    const fo = root.pane.fileOperations
+                    if (wrapper.model.section === Fang.PlaceSection.Trash)
+                        fo.trash(drop.urls)
+                    else if (drop.proposedAction === Qt.MoveAction)
+                        fo.move(drop.urls, "file://" + wrapper.model.url)
+                    else
+                        fo.autoTransfer(drop.urls, "file://" + wrapper.model.url)
+                    drop.acceptProposedAction()
                 }
             }
 

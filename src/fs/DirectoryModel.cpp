@@ -504,6 +504,12 @@ QString DirectoryModel::pathAt(int row) const
     return fi ? fi->path : QString();
 }
 
+bool DirectoryModel::isDirAt(int row) const
+{
+    const FileInfo* fi = infoAt(row);
+    return fi && fi->isDir;
+}
+
 int DirectoryModel::rowOf(const QString& path) const
 {
     for (size_t i = 0; i < m_root->visible.size(); ++i)

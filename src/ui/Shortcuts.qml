@@ -2,13 +2,13 @@ import QtQuick
 import Fang
 
 // Central shortcut map (docs/05). One place so the config/override can
-// remap them; bound from Settings in stage 7. Clipboard/trash/undo entries
-// join with stage 4, search with stage 6, preview with stage 5.
+// remap them; bound from Settings in stage 7. Search joins with stage 6,
+// preview with stage 5.
 Item {
     id: root
     property WindowController win: null
     property PaneController pane: null
-    /// The active pane's FileView (for rename).
+    /// The active pane's FileView (for rename/clipboard/trash).
     property var fileView: null
     signal locationBarRequested()
     signal searchRequested()
@@ -17,6 +17,10 @@ Item {
 
     readonly property var nav: pane ? pane.navigation : null
     readonly property var sel: pane ? pane.selection : null
+    /// File shortcuts only fire while the file view has focus and no inline
+    /// rename is running (otherwise Del/Ctrl+C belong to the text editor).
+    readonly property bool fileKeysActive:
+        fileView && fileView.activeFocus && fileView.renameRow < 0
 
     function zoomBy(delta) {
         if (pane)
@@ -90,4 +94,36 @@ Item {
         onActivated: if (root.fileView) root.fileView.startRenameCurrent()
     }
     Shortcut { sequence: "Ctrl+Shift+N"; onActivated: root.createFolderRequested() }
+
+    // -------------------------------------------------- clipboard & trash
+    Shortcut {
+        sequence: "Ctrl+C"
+        onActivated: if (root.fileKeysActive) root.fileView.copySelection()
+    }
+    Shortcut {
+        sequence: "Ctrl+X"
+        onActivated: if (root.fileKeysActive) root.fileView.cutSelection()
+    }
+    Shortcut {
+        sequence: "Ctrl+V"
+        onActivated: if (root.fileKeysActive) root.fileView.pasteHere()
+    }
+    Shortcut {
+        sequence: "Delete"
+        onActivated: if (root.fileKeysActive) root.fileView.trashSelection()
+    }
+    Shortcut {
+        sequence: "Shift+Delete"
+        onActivated: if (root.fileKeysActive) root.fileView.requestDeletePermanently()
+    }
+
+    // ---------------------------------------------------------- undo/redo
+    Shortcut {
+        sequence: "Ctrl+Z"
+        onActivated: if (!root.fileView || root.fileView.renameRow < 0) Application.undo.undo()
+    }
+    Shortcut {
+        sequence: "Ctrl+Shift+Z"
+        onActivated: if (!root.fileView || root.fileView.renameRow < 0) Application.undo.redo()
+    }
 }

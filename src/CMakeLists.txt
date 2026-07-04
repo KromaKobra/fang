@@ -13,6 +13,14 @@ set(FANG_CORE_SOURCES
     fs/FileInfo.h fs/FileInfo.cpp
     nav/Navigation.h nav/Navigation.cpp
     nav/Selection.h nav/Selection.cpp
+    ops/Operation.h ops/Operation.cpp
+    ops/CopyWorker.h ops/CopyWorker.cpp
+    ops/MoveWorker.h ops/MoveWorker.cpp
+    ops/DeleteWorker.h ops/DeleteWorker.cpp
+    ops/TrashManager.h ops/TrashManager.cpp
+    ops/UndoStack.h ops/UndoStack.cpp
+    ops/Clipboard.h ops/Clipboard.cpp
+    ops/FileOperationEngine.h ops/FileOperationEngine.cpp
     places/Places.h places/Places.cpp
     places/MountMonitor.h places/MountMonitor.cpp
     config/Theme.h config/Theme.cpp
@@ -41,6 +49,9 @@ set(FANG_QML_FILES
     ui/ColumnHeader.qml
     ui/ContextMenu.qml
     ui/CreateDialog.qml
+    ui/ConflictDialog.qml
+    ui/OperationOverlay.qml
+    ui/RenameEditor.qml
     ui/NotificationOverlay.qml
     ui/Shortcuts.qml
     ui/controls/Badge.qml

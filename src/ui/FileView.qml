@@ -12,10 +12,12 @@ FocusScope {
     // behavior.open_with = "double".
     property bool singleClickOpens: true
     property int renameRow: -1
-    property var cutPaths: []
+    readonly property var cutPaths: Application.clipboard.cutPaths
     signal activatedByUser()
     signal requestCreateFolder()
     signal requestCreateFile()
+    /// Asks the window chrome to confirm a permanent delete of the selection.
+    signal requestDeletePermanently()
 
     readonly property var th: Application.theme
     readonly property var currentView: viewLoader.item
@@ -63,6 +65,89 @@ FocusScope {
     function backgroundRightClick(sceneX, sceneY) {
         activatedByUser()
         contextMenu.popupBackground(sceneX, sceneY)
+    }
+
+    // ----------------------------------------------------- clipboard & ops
+
+    function locationUrl() {
+        return "file://" + pane.location
+    }
+
+    function copySelection() {
+        if (pane.selection.hasSelection)
+            Application.clipboard.copy(pane.selection.selectedUrls)
+    }
+
+    function cutSelection() {
+        if (pane.selection.hasSelection)
+            Application.clipboard.cut(pane.selection.selectedUrls)
+    }
+
+    function pasteHere() {
+        if (Application.clipboard.hasFiles)
+            Application.clipboard.paste(locationUrl())
+    }
+
+    function trashSelection() {
+        if (pane.selection.hasSelection)
+            pane.fileOperations.trash(pane.selection.selectedUrls)
+    }
+
+    /// Permanent delete without confirmation — the chrome confirms first
+    /// (Shift+Del / context menu go through requestDeletePermanently()).
+    function deleteSelectionNow() {
+        if (pane.selection.hasSelection)
+            pane.fileOperations.remove(pane.selection.selectedUrls)
+    }
+
+    // -------------------------------------------------------- drag & drop
+
+    /// text/uri-list payload for a drag that started on `row`: the whole
+    /// selection when that row is part of it, else just that row's file.
+    function dragUriList(row, url) {
+        const sel = pane.selection
+        const urls = (row >= 0 && sel.isSelected(row)) ? sel.selectedUrls : [url]
+        let lines = []
+        for (let i = 0; i < urls.length; ++i)
+            lines.push(String(urls[i]))
+        return lines.join("\r\n")
+    }
+
+    /// Shared drop policy (delegates, background, sidebar forwards here too):
+    /// Shift-drags arrive as MoveAction and force a move; internal drags
+    /// default to auto (move on same device, copy across); external drops
+    /// copy. DragEvent exposes no modifiers in QML, so Ctrl-forced copies of
+    /// internal drags degrade to auto.
+    function handleDrop(drop, destUrl) {
+        const urls = drop.urls
+        if (!urls || urls.length === 0)
+            return
+        const dest = String(destUrl)
+        for (let i = 0; i < urls.length; ++i) {
+            if (String(urls[i]) === dest)
+                return // dropping something onto itself
+        }
+        const fo = pane.fileOperations
+        if (drop.proposedAction === Qt.MoveAction)
+            fo.move(urls, destUrl)
+        else if (drop.source)
+            fo.autoTransfer(urls, destUrl)
+        else
+            fo.copy(urls, destUrl)
+        drop.acceptProposedAction()
+    }
+
+    /// True when every dragged url already lives directly in this pane's
+    /// directory (a background drop would be a no-op move).
+    function allInCurrentDir(urls) {
+        const here = "file://" + pane.location
+        for (let i = 0; i < urls.length; ++i) {
+            const s = String(urls[i])
+            const slash = s.lastIndexOf("/")
+            if (slash < 0 || s.substring(0, slash) !== here)
+                return false
+        }
+        return true
     }
 
     // ------------------------------------------------------------- renaming
@@ -147,6 +232,18 @@ FocusScope {
     }
 
     // ---------------------------------------------------------------- views
+
+    // Background drop target (→ this pane's directory). Delegate DropAreas
+    // sit above and take precedence for drops onto folders.
+    DropArea {
+        anchors.fill: parent
+        keys: ["text/uri-list"]
+        onDropped: function(drop) {
+            if (drop.source && root.allInCurrentDir(drop.urls))
+                return // internal reshuffle into the same dir: no-op
+            root.handleDrop(drop, root.locationUrl())
+        }
+    }
 
     Loader {
         id: viewLoader

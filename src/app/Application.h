@@ -10,11 +10,16 @@ class QJSEngine;
 Q_MOC_INCLUDE("config/Theme.h")
 Q_MOC_INCLUDE("app/WindowController.h")
 Q_MOC_INCLUDE("places/Places.h")
+Q_MOC_INCLUDE("ops/Clipboard.h")
+Q_MOC_INCLUDE("ops/UndoStack.h")
 
 namespace fang {
 
+class Clipboard;
+class FileOperationEngine;
 class Places;
 class Theme;
+class UndoStack;
 class WindowController;
 
 /// App-global QML singleton: version info, config/theme access, window
@@ -28,6 +33,8 @@ class Application : public QObject {
     Q_PROPERTY(QString appVersion READ appVersion CONSTANT)
     Q_PROPERTY(fang::Theme* theme READ theme NOTIFY themeChanged)
     Q_PROPERTY(fang::Places* places READ places CONSTANT)
+    Q_PROPERTY(fang::Clipboard* clipboard READ clipboard CONSTANT)
+    Q_PROPERTY(fang::UndoStack* undo READ undo CONSTANT)
     /// Non-empty when a user UI override failed to load and Fang fell back to
     /// the bundled UI (shown as a notification banner). Additive to API v1.
     Q_PROPERTY(QString overrideError READ overrideError NOTIFY overrideErrorChanged)
@@ -48,6 +55,9 @@ public:
     QString appVersion() const;
     Theme* theme() const { return m_theme; }
     Places* places() const { return m_places; }
+    Clipboard* clipboard() const;
+    UndoStack* undo() const;
+    FileOperationEngine* engine() const { return m_engine; }
 
     /// Central user-facing notification entry point: forwards to error().
     void notify(const QString& title, const QString& detail);
@@ -82,6 +92,7 @@ private:
 
     Theme* m_theme = nullptr;
     Places* m_places = nullptr;
+    FileOperationEngine* m_engine = nullptr;
     QString m_overrideError;
     QStringList m_startupPaths;
     QList<WindowController*> m_windows;

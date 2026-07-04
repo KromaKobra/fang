@@ -9,6 +9,7 @@ Rectangle {
     id: root
     property var model: null
     property bool current: false
+    property bool dropHover: false
     signal clicked()
     signal middleClicked()
     signal rightClicked(real sceneX, real sceneY)
@@ -20,8 +21,10 @@ Rectangle {
     implicitHeight: th.rowHeight
     radius: th.radiusSmall
     color: current ? th.surfaceActive
-         : mouse.containsMouse ? th.surfaceHover
+         : (mouse.containsMouse || dropHover) ? th.surfaceHover
          : "transparent"
+    border.color: th.accent
+    border.width: dropHover ? 1 : 0
 
     Image {
         id: icon

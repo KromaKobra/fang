@@ -78,6 +78,11 @@ public:
     std::shared_ptr<OpControl> control() const { return m_control; }
     bool isTerminal() const;
 
+    /// Per-type undo payload delivered by the worker's done() (engine-set;
+    /// consumed by UndoStack when replaying records).
+    QVariant undoData() const { return m_undoData; }
+    void setUndoData(const QVariant& data) { m_undoData = data; }
+
     /// Marks a synchronous operation done (rename/create paths).
     void finishSync(bool ok, const QString& error);
 
@@ -114,6 +119,7 @@ private:
     qint64 m_speed = 0;
     qint64 m_eta = -1;
     QString m_errorText;
+    QVariant m_undoData;
     QElapsedTimer m_clock;
     std::shared_ptr<OpControl> m_control;
 };

@@ -2,6 +2,7 @@
 
 #include "app/WindowController.h"
 #include "config/Theme.h"
+#include "ops/FileOperationEngine.h"
 #include "places/Places.h"
 #include "util/HumanFormat.h"
 #include "util/Logging.h"
@@ -27,6 +28,18 @@ Application::Application(QObject* parent)
 
     m_places = new Places(this);
     connect(m_places, &Places::error, this, &Application::error);
+
+    m_engine = new FileOperationEngine(this);
+}
+
+Clipboard* Application::clipboard() const
+{
+    return m_engine->clipboard();
+}
+
+UndoStack* Application::undo() const
+{
+    return m_engine->undoStack();
 }
 
 void Application::notify(const QString& title, const QString& detail)

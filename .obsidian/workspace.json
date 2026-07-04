@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "docs/PROGRESS.md",
+                "file": "docs/PROMPT.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "PROGRESS"
+              "title": "PROMPT"
             }
           }
         ]
@@ -185,19 +185,18 @@
   },
   "active": "7998ccb99b6dbf91",
   "lastOpenFiles": [
-    "build/src/CMakeFiles/fang.dir/link.d",
-    "build/src/fang",
-    "build/src/CMakeFiles/fang.dir/main.cpp.o",
-    "build/src/CMakeFiles/fang.dir/main.cpp.o.d",
-    "build/src/CMakeFiles/fang.dir/fang_autogen/mocs_compilation.cpp.o",
-    "build/src/CMakeFiles/fang.dir/fang_autogen/mocs_compilation.cpp.o.d",
-    "build/CMakeFiles/d/3a01046ba8f065d8dbc742fc953034a34e36dd3c001b7e32e2d3a19fb66b0609.d",
-    "build/src/fang_autogen/timestamp",
-    "build/src/CMakeFiles/fang_autogen.dir/AutogenUsed.txt",
-    "build/src/CMakeFiles/fang_autogen.dir/ParseCache.txt",
-    "build/src/fang_autogen/deps",
-    "docs/PROMPT.md",
     "docs/PROGRESS.md",
+    "build/CMakeCache.txt.tmp9c5bc",
+    "build/build.ninja",
+    "build/compile_commands.json",
+    "build/compile_commands.json.tmp16141",
+    "build/CTestTestfile.cmake",
+    "build/cmake_install.cmake",
+    "build/build.ninja.tmpcaf94",
+    "build/CMakeCache.txt",
+    "build/CMakeCache.txt.tmpea139",
+    "build/tests/CMakeFiles",
+    "docs/PROMPT.md",
     "README.md",
     "docs/08-build-packaging.md",
     "docs/10-repo-layout.md",

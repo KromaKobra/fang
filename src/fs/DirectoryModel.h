@@ -86,7 +86,9 @@ public:
     int count() const;
     qint64 totalSize() const;
     const FileInfo* infoAt(int row) const;
-    QString pathAt(int row) const;
+    Q_INVOKABLE QString pathAt(int row) const;
+    /// Whether the top-level row is a directory (additive to API v1).
+    Q_INVOKABLE bool isDirAt(int row) const;
     int rowOf(const QString& path) const;
     /// dataChanged for SelectedRole across everything (called by Selection).
     void notifySelectionChanged();
