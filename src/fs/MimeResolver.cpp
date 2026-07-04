@@ -27,7 +27,7 @@ MimeResolver::MimeResolver(QObject* parent)
 MimeResolver* MimeResolver::instance()
 {
     if (!s_instance)
-        s_instance = new MimeResolver();
+        s_instance = new MimeResolver(nullptr);
     return s_instance;
 }
 

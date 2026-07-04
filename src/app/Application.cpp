@@ -3,6 +3,7 @@
 #include "app/WindowController.h"
 #include "config/Theme.h"
 #include "places/Places.h"
+#include "util/HumanFormat.h"
 #include "util/Logging.h"
 
 #include <QCoreApplication>
@@ -77,6 +78,11 @@ QStringList Application::takeStartupPaths()
     QStringList out;
     m_startupPaths.swap(out);
     return out;
+}
+
+QString Application::formatSize(qint64 bytes) const
+{
+    return HumanFormat::size(bytes);
 }
 
 WindowController* Application::newWindow()

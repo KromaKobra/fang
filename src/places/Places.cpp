@@ -338,6 +338,29 @@ void Places::moveBookmark(int from, int to)
     rebuild();
 }
 
+int Places::bookmarkIndex(const QString& id) const
+{
+    const QString url = id.startsWith(QLatin1String("bookmark:")) ? id.mid(9) : id;
+    for (int i = 0; i < m_bookmarks.size(); ++i) {
+        if (m_bookmarks.at(i).url == url)
+            return i;
+    }
+    return -1;
+}
+
+void Places::renameBookmark(const QString& id, const QString& label)
+{
+    const QString url = id.startsWith(QLatin1String("bookmark:")) ? id.mid(9) : id;
+    for (Bookmark& b : m_bookmarks) {
+        if (b.url == url) {
+            b.label = label;
+            saveBookmarks();
+            rebuild();
+            return;
+        }
+    }
+}
+
 // ---------------------------------------------------------------- devices
 
 void Places::mount(const QString& id)

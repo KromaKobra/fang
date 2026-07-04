@@ -7,6 +7,10 @@ namespace fang {
 
 Q_NAMESPACE
 QML_NAMED_ELEMENT(Fang)
+// Values repeat across enums (OpType::Rename / ConflictMode::Rename,
+// OpType::Trash / PlaceSection::Trash); only scoped access is part of the
+// API (Fang.OpType.Rename), so skip the clashing unscoped registration.
+Q_CLASSINFO("RegisterEnumClassesUnscoped", "false")
 
 enum class ViewMode {
     Icons,

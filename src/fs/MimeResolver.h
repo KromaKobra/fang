@@ -21,7 +21,9 @@ class MimeResolver : public QObject {
     QML_SINGLETON
 
 public:
-    explicit MimeResolver(QObject* parent = nullptr);
+    /// No default argument: keeps the type non-default-constructible so the
+    /// QML engine uses create() instead of building a second instance.
+    explicit MimeResolver(QObject* parent);
 
     static MimeResolver* instance();
     static MimeResolver* create(QQmlEngine* qmlEngine, QJSEngine* jsEngine);

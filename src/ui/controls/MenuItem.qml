@@ -6,7 +6,6 @@ Rectangle {
     property string text: ""
     property string icon: ""
     property string shortcut: ""
-    property bool enabled: true
     property bool checked: false
     property bool showChecked: false
     property var menu: null

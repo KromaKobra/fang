@@ -58,7 +58,7 @@ int main(int argc, char* argv[])
         paths.prepend(sel.absolutePath());
     }
 
-    fang::Application fangApp;
+    fang::Application fangApp(nullptr);
     fangApp.setStartupPaths(paths);
 
     QQmlApplicationEngine engine;

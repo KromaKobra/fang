@@ -5,7 +5,6 @@ Rectangle {
     id: root
     property string icon: ""
     property string tooltip: ""
-    property bool enabled: true
     property bool checked: false
     property bool checkable: false
     property int iconSize: Application.theme.iconSizeSmall

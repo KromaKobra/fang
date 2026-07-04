@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "docs/PROMPT.md",
+                "file": "docs/PROGRESS.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "PROMPT"
+              "title": "PROGRESS"
             }
           }
         ]
@@ -185,26 +185,29 @@
   },
   "active": "7998ccb99b6dbf91",
   "lastOpenFiles": [
-    "README.md",
+    "build/src/CMakeFiles/fang.dir/link.d",
+    "build/src/stou3pN9",
+    "build/src/stNhKJY8",
+    "build/src/CMakeFiles/fangcore.dir/app/Application.cpp.o.d",
+    "build/CMakeFiles/d/10be5d03089e5f4d85ef6deb134967e787c3320ca4fc98cc15713a9de48a2a18.d",
+    "src/app/Application.cpp.tmp.2612.726a5cbaaadd",
+    "src/app/Application.cpp.tmp.2612.1dcc2488297f",
+    "build/src/CMakeFiles/fang.dir/main.cpp.o.d",
+    "build/CMakeFiles/d/3a01046ba8f065d8dbc742fc953034a34e36dd3c001b7e32e2d3a19fb66b0609.d",
+    "src/main.cpp.tmp.2612.42f855d4c7d5",
+    "build/src/stuCWxQ7",
     "docs/PROMPT.md",
+    "docs/PROGRESS.md",
+    "README.md",
     "docs/08-build-packaging.md",
-    "docs/PROMPT.md.tmp.18087.d0d722f589a0",
     "docs/10-repo-layout.md",
-    "docs/10-repo-layout.md.tmp.18087.ae79312d4ef6",
     "docs/09-testing.md",
-    "docs/09-testing.md.tmp.18087.6f045e0ea129",
     "docs/04-qml-api.md",
-    "docs/08-build-packaging.md.tmp.18087.4136e0deb950",
     "docs/07-features-roadmap.md",
-    "docs/07-features-roadmap.md.tmp.18087.9de1f7b3765a",
     "docs/06-config-theming.md",
-    "docs/06-config-theming.md.tmp.18087.0a3b68002291",
     "docs/05-default-ui.md",
-    "docs/05-default-ui.md.tmp.18087.633543539e26",
     "docs/01-architecture.md",
-    "docs/04-qml-api.md.tmp.18087.ea68813e3dde",
     "docs/00-overview.md",
-    "docs/03-core-backend.md",
-    "docs/03-core-backend.md.tmp.18087.63f84fbf0969"
+    "docs/03-core-backend.md"
   ]
 }

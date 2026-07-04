@@ -44,6 +44,11 @@ public:
     Q_INVOKABLE void addBookmark(const QString& url, const QString& label);
     Q_INVOKABLE void removeBookmark(const QString& id);
     Q_INVOKABLE void moveBookmark(int from, int to);
+    /// Bookmark-list index for a place id ("bookmark:<url>"), -1 if not a
+    /// bookmark. Additive to API v1; used by sidebar drag-reorder.
+    Q_INVOKABLE int bookmarkIndex(const QString& id) const;
+    /// Relabel a bookmark in place. Additive to API v1.
+    Q_INVOKABLE void renameBookmark(const QString& id, const QString& label);
     Q_INVOKABLE void mount(const QString& id);
     Q_INVOKABLE void unmount(const QString& id);
     Q_INVOKABLE void eject(const QString& id);

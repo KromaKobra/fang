@@ -1,4 +1,5 @@
 import QtQuick
+import QtQuick.Controls.Basic as QQC
 import Fang
 import "controls" as C
 
@@ -183,7 +184,7 @@ Item {
     C.Menu {
         id: completions
         property var paths: []
-        closePolicy: 0 // stays while typing; closed programmatically
+        closePolicy: QQC.Popup.NoAutoClose // stays while typing; closed programmatically
         modal: false
         Repeater {
             model: completions.paths

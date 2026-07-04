@@ -23,6 +23,41 @@ set(FANG_CORE_SOURCES
 
 set(FANG_QML_FILES
     ui/Main.qml
+    ui/MainWindow.qml
+    ui/TabBar.qml
+    ui/TabButton.qml
+    ui/Toolbar.qml
+    ui/LocationBar.qml
+    ui/ViewModeSwitch.qml
+    ui/Sidebar.qml
+    ui/PlaceRow.qml
+    ui/StatusBar.qml
+    ui/FileView.qml
+    ui/FileDelegate.qml
+    ui/IconsView.qml
+    ui/ListView.qml
+    ui/DetailsView.qml
+    ui/TreeView.qml
+    ui/ColumnHeader.qml
+    ui/ContextMenu.qml
+    ui/CreateDialog.qml
+    ui/NotificationOverlay.qml
+    ui/Shortcuts.qml
+    ui/controls/Badge.qml
+    ui/controls/Button.qml
+    ui/controls/Checkbox.qml
+    ui/controls/IconButton.qml
+    ui/controls/Menu.qml
+    ui/controls/MenuItem.qml
+    ui/controls/Popup.qml
+    ui/controls/ScrollBar.qml
+    ui/controls/Separator.qml
+    ui/controls/Slider.qml
+    ui/controls/Spinner.qml
+    ui/controls/Splitter.qml
+    ui/controls/TextField.qml
+    ui/controls/ToolButton.qml
+    ui/controls/Tooltip.qml
 )
 
 set(FANG_RESOURCE_FILES

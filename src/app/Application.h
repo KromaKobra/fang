@@ -33,7 +33,11 @@ class Application : public QObject {
     Q_PROPERTY(QString overrideError READ overrideError NOTIFY overrideErrorChanged)
 
 public:
-    explicit Application(QObject* parent = nullptr);
+    /// No default argument: a default-constructible type makes the QML
+    /// engine construct its own singleton instance instead of calling
+    /// create() (QQmlPrivate::singletonConstructionMode prefers the
+    /// constructor), which would duplicate the app-owned instance.
+    explicit Application(QObject* parent);
     ~Application() override;
 
     static Application* instance();
@@ -55,6 +59,10 @@ public:
     /// first window. Consumed by newWindow().
     void setStartupPaths(const QStringList& paths);
     QStringList takeStartupPaths();
+
+    /// "18.4 MB" — byte formatting for QML (status bar, capacity bars).
+    /// Additive to API v1.
+    Q_INVOKABLE QString formatSize(qint64 bytes) const;
 
     Q_INVOKABLE fang::WindowController* newWindow();
     Q_INVOKABLE void openPath(const QString& path);

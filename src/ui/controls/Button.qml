@@ -5,7 +5,6 @@ Rectangle {
     id: root
     property alias text: label.text
     property bool accent: false
-    property bool enabled: true
     signal clicked()
 
     readonly property var th: Application.theme

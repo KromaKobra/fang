@@ -22,8 +22,12 @@
             tomlplusplus
           ];
           # Let the Qt tools (qmlcachegen etc.) and tests run inside the shell.
+          # Unwrapped binaries need the qtdeclarative QML modules on the
+          # import path (QtQuick.Controls.* plugins are not linked in).
           shellHook = ''
             export QT_QPA_PLATFORM=''${QT_QPA_PLATFORM:-wayland;xcb}
+            export QML_IMPORT_PATH=${pkgs.qt6.qtdeclarative}/lib/qt-6/qml
+            export QML2_IMPORT_PATH=$QML_IMPORT_PATH
           '';
         };
       });
