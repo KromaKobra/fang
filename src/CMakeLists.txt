@@ -26,6 +26,9 @@ set(FANG_CORE_SOURCES
     preview/ThumbnailGenerator.h preview/ThumbnailGenerator.cpp
     preview/ThumbnailProvider.h preview/ThumbnailProvider.cpp
     preview/Previews.h preview/Previews.cpp
+    search/SearchQuery.h search/SearchQuery.cpp
+    search/SearchResultsModel.h search/SearchResultsModel.cpp
+    search/SearchEngine.h search/SearchEngine.cpp
     config/Theme.h config/Theme.cpp
     util/Enums.h
     util/HumanFormat.h util/HumanFormat.cpp
@@ -44,6 +47,7 @@ set(FANG_QML_FILES
     ui/PlaceRow.qml
     ui/StatusBar.qml
     ui/PreviewPane.qml
+    ui/SearchPanel.qml
     ui/FileView.qml
     ui/FileDelegate.qml
     ui/IconsView.qml

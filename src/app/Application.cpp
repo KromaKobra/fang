@@ -5,6 +5,7 @@
 #include "ops/FileOperationEngine.h"
 #include "places/Places.h"
 #include "preview/Previews.h"
+#include "search/SearchEngine.h"
 #include "util/HumanFormat.h"
 #include "util/Logging.h"
 
@@ -32,6 +33,7 @@ Application::Application(QObject* parent)
 
     m_engine = new FileOperationEngine(this);
     m_previews = new Previews(this);
+    m_search = new SearchEngine(this);
 }
 
 Clipboard* Application::clipboard() const

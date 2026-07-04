@@ -19,6 +19,15 @@ Rectangle {
     property real sidebarW: th.sidebarWidth
     property bool previewVisible: false
     property real previewW: 280
+    property bool searchVisible: false
+
+    function toggleSearch() {
+        searchVisible = !searchVisible
+        if (searchVisible)
+            searchPanel.openPanel()
+        else
+            Application.search.cancel()
+    }
 
     color: th.background
 
@@ -41,7 +50,18 @@ Rectangle {
         anchors.right: parent.right
         pane: root.pane
         win: root.win
-        onSearchToggled: {} // search panel arrives in stage 6
+        onSearchToggled: root.toggleSearch()
+    }
+
+    SearchPanel {
+        id: searchPanel
+        visible: root.searchVisible
+        height: visible ? implicitHeight : 0
+        anchors.top: toolbar.bottom
+        anchors.left: parent.left
+        anchors.right: parent.right
+        pane: root.pane
+        onClosed: root.toggleSearch()
     }
 
     StatusBar {
@@ -54,7 +74,7 @@ Rectangle {
 
     Item {
         id: body
-        anchors.top: toolbar.bottom
+        anchors.top: searchPanel.bottom
         anchors.bottom: statusBar.top
         anchors.left: parent.left
         anchors.right: parent.right
@@ -305,7 +325,7 @@ Rectangle {
         pane: root.pane
         fileView: root.currentFileView
         onLocationBarRequested: root.focusLocationBar()
-        onSearchRequested: {} // stage 6
+        onSearchRequested: root.toggleSearch()
         onCreateFolderRequested: createDialog.openFor("folder")
         onCreateFileRequested: createDialog.openFor("file")
         onPreviewToggleRequested: root.previewVisible = !root.previewVisible
