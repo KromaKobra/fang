@@ -4,6 +4,7 @@
 #include "config/Theme.h"
 #include "ops/FileOperationEngine.h"
 #include "places/Places.h"
+#include "preview/Previews.h"
 #include "util/HumanFormat.h"
 #include "util/Logging.h"
 
@@ -30,6 +31,7 @@ Application::Application(QObject* parent)
     connect(m_places, &Places::error, this, &Application::error);
 
     m_engine = new FileOperationEngine(this);
+    m_previews = new Previews(this);
 }
 
 Clipboard* Application::clipboard() const

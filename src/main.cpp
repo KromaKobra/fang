@@ -1,5 +1,6 @@
 #include "app/Application.h"
 #include "fs/IconResolver.h"
+#include "preview/ThumbnailProvider.h"
 #include "util/Logging.h"
 
 #include <QCommandLineParser>
@@ -64,6 +65,7 @@ int main(int argc, char* argv[])
     QQmlApplicationEngine engine;
     engine.addImportPath(QStringLiteral("qrc:/"));
     engine.addImageProvider(QStringLiteral("fang-icon"), new fang::IconImageProvider);
+    engine.addImageProvider(QStringLiteral("fang-thumb"), new fang::ThumbnailProvider);
 
     // UI override resolution (docs/03 §1, docs/04): a user project at
     // ~/.config/fang/ui/main.qml replaces the bundled UI; a broken override

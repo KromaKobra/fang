@@ -71,16 +71,30 @@ Item {
                 anchors.margins: root.th.spacingSmall
                 spacing: root.th.spacingSmall
 
-                Image {
+                Item {
                     anchors.horizontalCenter: parent.horizontalCenter
                     width: root.pane.iconSize
                     height: root.pane.iconSize
-                    fillMode: Image.PreserveAspectFit
-                    asynchronous: true
-                    source: dele.model.thumbnail !== ""
-                        ? dele.model.thumbnail
-                        : "image://fang-icon/" + dele.model.iconName
-                    sourceSize: Qt.size(width, height)
+
+                    // Themed icon shows immediately; the thumbnail covers it
+                    // once ready (graceful fallback while loading / on error).
+                    Image {
+                        anchors.fill: parent
+                        fillMode: Image.PreserveAspectFit
+                        asynchronous: true
+                        visible: thumb.status !== Image.Ready
+                        source: "image://fang-icon/" + dele.model.iconName
+                        sourceSize: Qt.size(width, height)
+                    }
+                    Image {
+                        id: thumb
+                        anchors.fill: parent
+                        fillMode: Image.PreserveAspectFit
+                        asynchronous: true
+                        visible: status === Image.Ready
+                        source: dele.model.thumbnail
+                        sourceSize: Qt.size(width, height)
+                    }
                 }
                 Text {
                     width: parent.width

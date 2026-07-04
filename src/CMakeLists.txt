@@ -23,6 +23,9 @@ set(FANG_CORE_SOURCES
     ops/FileOperationEngine.h ops/FileOperationEngine.cpp
     places/Places.h places/Places.cpp
     places/MountMonitor.h places/MountMonitor.cpp
+    preview/ThumbnailGenerator.h preview/ThumbnailGenerator.cpp
+    preview/ThumbnailProvider.h preview/ThumbnailProvider.cpp
+    preview/Previews.h preview/Previews.cpp
     config/Theme.h config/Theme.cpp
     util/Enums.h
     util/HumanFormat.h util/HumanFormat.cpp
@@ -40,6 +43,7 @@ set(FANG_QML_FILES
     ui/Sidebar.qml
     ui/PlaceRow.qml
     ui/StatusBar.qml
+    ui/PreviewPane.qml
     ui/FileView.qml
     ui/FileDelegate.qml
     ui/IconsView.qml

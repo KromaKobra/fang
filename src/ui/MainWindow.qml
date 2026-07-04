@@ -17,6 +17,8 @@ Rectangle {
     property var currentFileView: null
 
     property real sidebarW: th.sidebarWidth
+    property bool previewVisible: false
+    property real previewW: 280
 
     color: th.background
 
@@ -77,12 +79,33 @@ Rectangle {
             }
         }
 
+        PreviewPane {
+            id: previewPane
+            visible: root.previewVisible
+            anchors.top: parent.top
+            anchors.bottom: parent.bottom
+            anchors.right: parent.right
+            width: visible ? root.previewW : 0
+            pane: root.pane
+        }
+
+        C.Splitter {
+            id: previewSplitter
+            visible: root.previewVisible
+            anchors.top: parent.top
+            anchors.bottom: parent.bottom
+            anchors.right: previewPane.left
+            onDragged: function(delta) {
+                root.previewW = Math.min(480, Math.max(180, root.previewW - delta))
+            }
+        }
+
         Item {
             id: paneArea
             anchors.top: parent.top
             anchors.bottom: parent.bottom
             anchors.left: sidebarSplitter.right
-            anchors.right: parent.right
+            anchors.right: root.previewVisible ? previewSplitter.left : parent.right
 
             Repeater {
                 model: root.win ? root.win.tabCount : 0
@@ -285,5 +308,6 @@ Rectangle {
         onSearchRequested: {} // stage 6
         onCreateFolderRequested: createDialog.openFor("folder")
         onCreateFileRequested: createDialog.openFor("file")
+        onPreviewToggleRequested: root.previewVisible = !root.previewVisible
     }
 }

@@ -176,16 +176,28 @@ Item {
                             anchors.leftMargin: root.th.spacingMedium
                             spacing: root.th.spacingMedium
 
-                            Image {
+                            Item {
                                 visible: modelData === "name"
                                 width: root.th.iconSizeSmall
                                 height: root.th.iconSizeSmall
                                 anchors.verticalCenter: parent.verticalCenter
-                                asynchronous: true
-                                source: visible ? (dele.model.thumbnail !== ""
-                                    ? dele.model.thumbnail
-                                    : "image://fang-icon/" + dele.model.iconName) : ""
-                                sourceSize: Qt.size(width, height)
+
+                                Image {
+                                    anchors.fill: parent
+                                    asynchronous: true
+                                    visible: rowThumb.status !== Image.Ready
+                                    source: parent.visible
+                                        ? "image://fang-icon/" + dele.model.iconName : ""
+                                    sourceSize: Qt.size(width, height)
+                                }
+                                Image {
+                                    id: rowThumb
+                                    anchors.fill: parent
+                                    asynchronous: true
+                                    visible: status === Image.Ready
+                                    source: parent.visible ? dele.model.thumbnail : ""
+                                    sourceSize: Qt.size(width, height)
+                                }
                             }
                             Text {
                                 width: parent.width - (modelData === "name"

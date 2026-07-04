@@ -12,12 +12,14 @@ Q_MOC_INCLUDE("app/WindowController.h")
 Q_MOC_INCLUDE("places/Places.h")
 Q_MOC_INCLUDE("ops/Clipboard.h")
 Q_MOC_INCLUDE("ops/UndoStack.h")
+Q_MOC_INCLUDE("preview/Previews.h")
 
 namespace fang {
 
 class Clipboard;
 class FileOperationEngine;
 class Places;
+class Previews;
 class Theme;
 class UndoStack;
 class WindowController;
@@ -35,6 +37,8 @@ class Application : public QObject {
     Q_PROPERTY(fang::Places* places READ places CONSTANT)
     Q_PROPERTY(fang::Clipboard* clipboard READ clipboard CONSTANT)
     Q_PROPERTY(fang::UndoStack* undo READ undo CONSTANT)
+    /// Preview-pane data (text peeks, metadata). Additive to API v1.
+    Q_PROPERTY(fang::Previews* previews READ previews CONSTANT)
     /// Non-empty when a user UI override failed to load and Fang fell back to
     /// the bundled UI (shown as a notification banner). Additive to API v1.
     Q_PROPERTY(QString overrideError READ overrideError NOTIFY overrideErrorChanged)
@@ -57,6 +61,7 @@ public:
     Places* places() const { return m_places; }
     Clipboard* clipboard() const;
     UndoStack* undo() const;
+    Previews* previews() const { return m_previews; }
     FileOperationEngine* engine() const { return m_engine; }
 
     /// Central user-facing notification entry point: forwards to error().
@@ -93,6 +98,7 @@ private:
     Theme* m_theme = nullptr;
     Places* m_places = nullptr;
     FileOperationEngine* m_engine = nullptr;
+    Previews* m_previews = nullptr;
     QString m_overrideError;
     QStringList m_startupPaths;
     QList<WindowController*> m_windows;

@@ -14,6 +14,7 @@ Item {
     signal searchRequested()
     signal createFolderRequested()
     signal createFileRequested()
+    signal previewToggleRequested()
 
     readonly property var nav: pane ? pane.navigation : null
     readonly property var sel: pane ? pane.selection : null
@@ -63,6 +64,8 @@ Item {
         onActivated: if (root.pane) root.pane.showHidden = !root.pane.showHidden
     }
     Shortcut { sequence: "F3"; onActivated: root.win.toggleSplit() }
+    Shortcut { sequence: "F11"; onActivated: root.previewToggleRequested() }
+    Shortcut { sequence: "F7"; onActivated: root.previewToggleRequested() }
     Shortcut {
         sequence: "Ctrl+1"
         onActivated: if (root.pane) root.pane.viewMode = Fang.ViewMode.Icons
