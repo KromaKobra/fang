@@ -14,6 +14,7 @@ Item {
     signal createFolderRequested()
     signal createFileRequested()
     signal previewToggleRequested()
+    signal propertiesRequested()
 
     readonly property var nav: pane ? pane.navigation : null
     readonly property var sel: pane ? pane.selection : null
@@ -143,6 +144,10 @@ Item {
     Shortcut {
         sequence: root.key("new_folder", "Ctrl+Shift+N")
         onActivated: root.createFolderRequested()
+    }
+    Shortcut {
+        sequence: root.key("properties", "Alt+Return")
+        onActivated: root.propertiesRequested()
     }
 
     // -------------------------------------------------- clipboard & trash

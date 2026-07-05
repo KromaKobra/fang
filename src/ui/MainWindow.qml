@@ -171,6 +171,8 @@ Rectangle {
                         onRequestCreateFile: createDialog.openFor("file")
                         onRequestDeletePermanently: deleteConfirm.openFor(leftView)
                         onRequestTrash: deleteConfirm.openForTrash(leftView)
+                        onRequestProperties: root.openProperties(leftView)
+                        onRequestOpenWith: openWithDialog.openFor(leftView.pane)
 
                         // Active-pane accent border (only meaningful in split).
                         Rectangle {
@@ -212,6 +214,8 @@ Rectangle {
                             onRequestCreateFile: createDialog.openFor("file")
                             onRequestDeletePermanently: deleteConfirm.openFor(rightView)
                             onRequestTrash: deleteConfirm.openForTrash(rightView)
+                            onRequestProperties: root.openProperties(rightView)
+                            onRequestOpenWith: openWithDialog.openFor(rightView.pane)
 
                             Rectangle {
                                 anchors.fill: parent
@@ -225,6 +229,26 @@ Rectangle {
                 }
             }
         }
+    }
+
+    /// Properties for the selection's current item, else the directory.
+    function openProperties(fv) {
+        const p = fv ? fv.pane : root.pane
+        if (!p)
+            return
+        const path = p.selection.hasSelection && p.selection.current >= 0
+                   ? p.model.pathAt(p.selection.current) : p.location
+        propertiesDialog.openFor(path)
+    }
+
+    PropertiesDialog {
+        id: propertiesDialog
+        parent: root
+    }
+
+    OpenWithDialog {
+        id: openWithDialog
+        parent: root
     }
 
     CreateDialog {
@@ -353,5 +377,6 @@ Rectangle {
         onCreateFolderRequested: createDialog.openFor("folder")
         onCreateFileRequested: createDialog.openFor("file")
         onPreviewToggleRequested: root.previewVisible = !root.previewVisible
+        onPropertiesRequested: root.openProperties(root.currentFileView)
     }
 }

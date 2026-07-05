@@ -9,6 +9,8 @@ Rectangle {
     property bool checked: false
     property bool showChecked: false
     property var menu: null
+    /// false for items that open a follow-up menu themselves.
+    property bool closesMenu: true
     signal triggered()
 
     readonly property var th: Application.theme
@@ -66,7 +68,7 @@ Rectangle {
             if (!root.enabled)
                 return
             root.triggered()
-            if (root.menu)
+            if (root.menu && root.closesMenu)
                 root.menu.close()
         }
     }

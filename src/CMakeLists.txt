@@ -33,8 +33,11 @@ set(FANG_CORE_SOURCES
     config/ConfigStore.h config/ConfigStore.cpp
     config/Settings.h config/Settings.cpp
     config/AppearancePortal.h config/AppearancePortal.cpp
+    config/ActionParser.h config/ActionParser.cpp
+    config/ActionRegistry.h config/ActionRegistry.cpp
     util/Enums.h
     util/HumanFormat.h util/HumanFormat.cpp
+    util/ShellQuote.h util/ShellQuote.cpp
     util/Logging.h util/Logging.cpp
 )
 
@@ -61,6 +64,8 @@ set(FANG_QML_FILES
     ui/ContextMenu.qml
     ui/CreateDialog.qml
     ui/ConflictDialog.qml
+    ui/PropertiesDialog.qml
+    ui/OpenWithDialog.qml
     ui/OperationOverlay.qml
     ui/RenameEditor.qml
     ui/NotificationOverlay.qml

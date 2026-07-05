@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>dev.kromakobra.Fang</id>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>GPL-3.0-or-later</project_license>
+  <name>Fang</name>
+  <summary>Lightweight, fully customizable file manager</summary>
+  <description>
+    <p>
+      Fang is a Wayland-first file manager for Linux built with Qt Quick.
+      It ships a fast default UI — tabs, split view, four view modes,
+      threaded file operations with undo, trash, search and image
+      thumbnails — and lets you replace the entire view layer with your own
+      QML while a stable controller API does the heavy lifting.
+    </p>
+    <ul>
+      <li>Icons, list, details and tree views with type-to-filter</li>
+      <li>Threaded copy/move/trash with conflict handling and multi-level undo</li>
+      <li>Recursive search with optional content matching</li>
+      <li>Custom context-menu actions and full TOML theming</li>
+      <li>Replace the whole UI from ~/.config/fang/ui/main.qml</li>
+    </ul>
+  </description>
+  <launchable type="desktop-id">dev.kromakobra.Fang.desktop</launchable>
+  <categories>
+    <category>System</category>
+    <category>FileManager</category>
+  </categories>
+  <provides>
+    <binary>fang</binary>
+  </provides>
+  <content_rating type="oars-1.1"/>
+  <releases>
+    <release version="0.1.0" date="2026-07-04"/>
+  </releases>
+</component>

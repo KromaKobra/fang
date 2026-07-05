@@ -28,6 +28,15 @@ Item {
                 root.fileView.backgroundClick()
             }
         }
+        onPressed: function(ev) {
+            if (ev.button === Qt.LeftButton)
+                rubber.begin(ev.x, ev.y)
+        }
+        onPositionChanged: function(ev) {
+            if (pressed && (ev.buttons & Qt.LeftButton))
+                rubber.update(ev.x, ev.y)
+        }
+        onReleased: rubber.end()
     }
 
     QQ.GridView {
@@ -81,6 +90,47 @@ Item {
                 }
             }
         }
+    }
+
+    // Rubber-band selection overlay (columns scroll horizontally here).
+    Rectangle {
+        id: rubber
+        property real startX: 0
+        property real startY: 0
+        property bool active: false
+        visible: active && (width > 4 || height > 4)
+        color: Qt.alpha(root.th.accent, 0.15)
+        border.color: root.th.accent
+        border.width: 1
+        z: 10
+
+        function begin(x0, y0) {
+            startX = x0; startY = y0
+            x = x0; y = y0
+            width = 0; height = 0
+            active = true
+        }
+        function update(x1, y1) {
+            if (!active)
+                return
+            x = Math.min(startX, x1)
+            y = Math.min(startY, y1)
+            width = Math.abs(x1 - startX)
+            height = Math.abs(y1 - startY)
+            const sel = root.pane.selection
+            sel.clear()
+            for (let i = 0; i < root.pane.itemCount; ++i) {
+                const item = grid.itemAtIndex(i)
+                if (!item)
+                    continue
+                const ix = item.x - grid.contentX
+                const iy = item.y
+                if (ix < x + width && ix + item.width > x
+                        && iy < y + height && iy + item.height > y)
+                    sel.toggle(i)
+            }
+        }
+        function end() { active = false }
     }
 
     C.ScrollBar {

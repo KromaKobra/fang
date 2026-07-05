@@ -111,17 +111,49 @@ fails with `module "QtQuick.Controls.Basic" is not installed`.
   mirrored by Main.qml); Application.reloadConfig() = disk reload +
   notifyAllChanged.
 
-**App is in a user-testable state at this commit:** browse, tabs, split view,
-sidebar/places/bookmarks, all four view modes, sorting/columns, type-to-filter
-or type-to-jump, hidden toggle, rename (F2), create folder/file, open files
-via default app, breadcrumb/location editing, zoom slider, toasts,
-copy/move/trash/undo/redo/paste/DnD with conflict + progress UI, image
-thumbnails, preview pane, threaded search, full config.toml (live-persisted
-settings, shortcut remaps, themes incl. user themes + follow_system portal),
-session save/restore. NOT yet present: custom actions/open-with/properties
-dialogs (stage 8), packaging files (stage 9), tests (stage 10).
+- **Stage 8 — DONE** (this commit). util/ShellQuote (POSIX '\'' quoting),
+  config/ActionParser (toml → ActionDef, drops id-less entries),
+  config/ActionRegistry on Application.actions (bundled qrc actions.toml +
+  user file merge by id, show_in_menu=false disables, actionsFor(Selection*)
+  — null/empty selection = background context, non-empty = file context with
+  min/max/mime-glob/extension filters (every file must match), run() expands
+  %f %F %u %U %d %n %% shell-quoted and startDetached's /bin/sh -c in the
+  pane dir; run_in_terminal wraps in terminalPrefix(): explicit
+  general.terminal_command tokens, or auto-detect $TERMINAL/kitty/foot/
+  alacritty/wezterm("start --")/konsole|gnome-terminal|xterm("-e")).
+  Application.reloadActions() wired. ContextMenu: custom actions above
+  Properties (Repeater; verified Repeater-in-controls/Menu works), Open
+  With… flyout menu (MimeResolver.appsFor of current file, "Other
+  Application…" → dialog; flyout replaces main menu at same coords — true
+  hover submenus not attempted), Properties items in both menus.
+  OpenWithDialog (app list + always-use → setDefaultApp), PropertiesDialog
+  (General with async dir size via existing Previews.computeDirSize,
+  read-only rwx grid — v1 has no chmod API, Open With default selector),
+  requestProperties/requestOpenWith signals FileView→MainWindow, Alt+Return
+  "properties" shortcut. MenuItem grew `closesMenu` (flyout trigger).
+- **Stage 9 — DONE** (this commit): data/dev.kromakobra.Fang.desktop,
+  metainfo.xml, icons SVG (install rules pre-existed), README rewritten.
+  Override loading was already done in main.cpp.
+- **Stage 10 tests — SKIPPED** on user instruction (manual QA only). The
+  plan below is kept for a future session.
+- **User-requested changes (this commit):**
+  - Default click behavior flipped: behavior.open_with default now "double"
+    (single click selects + feeds preview pane; double-click/Enter opens;
+    select_with default now "single"). docs/05+06 updated to match. FileView
+    already honored the setting — only Settings.cpp defaults changed.
+  - Rubber-band selection added to ListView.qml (Icons/Details already had
+    it; contentX not contentY — horizontal flow). Tree keeps click-only.
+    Ctrl/Shift-click multi-select already existed in FileView.clickRow.
+  - User icon overrides: IconResolver::resolve now checks
+    $XDG_CONFIG_HOME/fang/icons/<name>.svg|png before QIcon::fromTheme at
+    EVERY step of the fallback chain; names with '/' rejected (path escape).
+    Verified working (offscreen image://fang-icon/folder → user file).
+  - docs/RICING.md: full customization guide (config/themes/icons/actions/
+    UI override + API orientation map); linked from README.
 
-## Next: stages 8–10 per the plan below.
+**App is feature-complete for v1 at this commit:** everything above plus
+custom actions in context menus, open-with + properties dialogs, packaging
+files. Remaining: tests (stage 10, skipped for now).
 
 ## Key architecture decisions (verified compiling/working)
 
@@ -173,7 +205,7 @@ dialogs (stage 8), packaging files (stage 9), tests (stage 10).
   by having each tab page push it on visibility/active-pane change — Repeater
   itemAt() is not reactive, don't try to bind through it.
 
-## Remaining stages 8–10 — plan + decisions already made
+## Original stages 8–10 plan (8–9 done; kept for stage-10 tests)
 
 - **Stage 8 actions:** config/{ActionRegistry,ActionParser} + util/ShellQuote.
   ShellQuote::quote(str) POSIX single-quote escaping ('\'' pattern);

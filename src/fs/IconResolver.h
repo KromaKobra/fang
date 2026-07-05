@@ -14,12 +14,15 @@ public:
     /// Applies appearance.icon_theme ("auto" keeps the system default).
     static void setIconTheme(const QString& themeName);
 
-    /// Resolves an icon name to a pixmap, walking a fallback chain and
-    /// finally painting a generic folder/file glyph so icon-less systems
-    /// still get something visible.
+    /// Resolves an icon name to a pixmap: user overrides from
+    /// ~/.config/fang/icons/<name>.svg|png first, then the icon theme with a
+    /// fallback chain, finally a painted generic folder/file glyph so
+    /// icon-less systems still get something visible.
     static QPixmap resolve(const QString& iconName, int size);
 
 private:
+    /// $XDG_CONFIG_HOME/fang/icons/<name>.svg (or .png), empty if absent.
+    static QString userIconFile(const QString& iconName);
     static QPixmap paintFallback(const QString& iconName, int size);
 };
 

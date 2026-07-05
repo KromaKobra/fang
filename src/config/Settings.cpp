@@ -209,7 +209,7 @@ void Settings::setPreviewPaneWidth(int v)
 QString Settings::openWith() const
 {
     return m_store->value(kBehavior, QStringLiteral("open_with"),
-                          QStringLiteral("single")).toString();
+                          QStringLiteral("double")).toString();
 }
 void Settings::setOpenWith(const QString& v)
 {
@@ -219,7 +219,7 @@ void Settings::setOpenWith(const QString& v)
 QString Settings::selectWith() const
 {
     return m_store->value(kBehavior, QStringLiteral("select_with"),
-                          QStringLiteral("double")).toString();
+                          QStringLiteral("single")).toString();
 }
 void Settings::setSelectWith(const QString& v)
 {

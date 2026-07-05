@@ -116,9 +116,10 @@ Custom actions are inserted where their TOML declares (default: above Properties
 
 ## Interaction rules (v1 defaults, all configurable)
 
-- **Single-click opens** files/folders; hover to preselect. Rubber-band select on empty
-  drag. `Ctrl+click` toggles, `Shift+click`/`Shift+arrows` range-select. (A config switch
-  flips to double-click-open / single-click-select.)
+- **Single-click selects** (feeding the preview pane); **double-click or Enter opens**
+  files/folders. Rubber-band select on empty drag. `Ctrl+click` toggles,
+  `Shift+click`/`Shift+arrows` range-select. (A config switch, `behavior.open_with =
+  "single"`, flips to single-click-open.)
 - **Keyboard:** arrows/Home/End/PageUp/Down navigate; type-to-search jumps to matching
   name (and feeds `filterText` when the filter bar is open); Enter opens; Backspace/Alt+↑
   go up; Alt+←/→ back/forward.

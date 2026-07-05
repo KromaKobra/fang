@@ -1,0 +1,12 @@
+[Desktop Entry]
+Type=Application
+Name=Fang
+GenericName=File Manager
+Comment=Lightweight, fully customizable file manager
+Exec=fang %U
+Icon=dev.kromakobra.Fang
+Terminal=false
+Categories=System;FileTools;FileManager;Qt;
+MimeType=inode/directory;
+Keywords=files;browser;directory;folder;explorer;
+StartupNotify=true

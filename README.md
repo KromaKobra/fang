@@ -5,8 +5,11 @@
 - **By:** Kroma Kobra
 - **Type:** Desktop file manager (Wayland-first)
 - **License:** GPL-3.0-or-later
-- **Status:** Planning / pre-implementation. This repository currently contains the
-  complete design specification. No application code has been generated yet.
+- **Status:** Working v1. Browse, tabs, split view, four view modes, threaded
+  copy/move/trash with conflict handling and multi-level undo, freedesktop trash,
+  clipboard + drag-and-drop, image thumbnails, preview pane, recursive search,
+  custom context-menu actions, open-with/properties dialogs, full TOML config +
+  theming, session restore, and a wholesale-replaceable QML UI.
 
 ---
 
@@ -17,7 +20,8 @@ on top of a stable, versioned C++ core. The C++ core owns all the "hard" work
 (filesystem models, threaded file operations, trash, undo, search, thumbnails) and
 exposes it to QML through a documented API. The default UI is bundled with the app, but
 **any developer can replace the whole interface** by dropping a QML project into
-`~/.config/fang/`.
+`~/.config/fang/ui/`. See **[docs/RICING.md](docs/RICING.md)** for the full
+customization guide (UI overrides, themes, custom icons, actions).
 
 Fang aims for feature parity with KDE's Dolphin over time, but without the Plasma
 dependency chain — and with a theming model that **does not fight the desktop** (Fang
@@ -25,7 +29,8 @@ owns its own colors, so dark mode always sticks).
 
 ## Design pillars
 
-1. **Lightweight.** C++/Qt6 core, custom Qt Quick components, minimal dependencies.
+1. **Lightweight.** C++/Qt6 core, custom Qt Quick components, minimal dependencies
+   (Qt 6 + toml++, nothing else).
 2. **Fully customizable.** The view layer is data-driven QML over a stable API and can be
    wholesale replaced by the user.
 3. **Wayland-first.** Designed and tested on Wayland (Hyprland), works on X11 via Qt.
@@ -33,28 +38,39 @@ owns its own colors, so dark mode always sticks).
    system color scheme unless you opt in.
 5. **Distro-agnostic.** No KDE/Plasma runtime requirement. Built with plain CMake + Qt6.
 
-## Locked technical decisions
+## Building
 
-| Area | Decision |
-|------|----------|
-| Core language | C++20 |
-| GUI toolkit | Qt 6 (Qt Quick / QML), custom components on bare Qt Quick |
-| Process model | Multi-process (one process per launch) |
-| GUI override | Full view layer over a stable, versioned QML API; overridable from `~/.config/fang/` |
-| Theming | Self-owned theme (bundled dark default), opt-in follow of system via freedesktop appearance portal |
-| File ops | Threaded, freedesktop Trash spec, conflict-resolution dialog, multi-level undo/redo |
-| Search | Native threaded recursive walk + instant type-to-filter |
-| Previews | Qt image thumbnails, read/write shared freedesktop thumbnail cache; text/code peek |
-| Remote FS (v1) | Local filesystems + already-mounted gvfs paths only |
-| Custom actions | TOML-defined context-menu actions with placeholders |
-| App launching | freedesktop `.desktop` / MIME associations (xdg/gio); single-click open |
-| Config format | TOML |
-| Build | CMake |
-| Tests | Qt Test unit tests for core + QML smoke test |
+```sh
+cmake -B build -G Ninja
+cmake --build build
+./build/src/fang ~              # open your home directory
+ctest --test-dir build          # run the test suite
+```
+
+On NixOS use the bundled flake dev shell:
+
+```sh
+nix develop -c bash -c 'cmake -B build -G Ninja && cmake --build build'
+```
+
+See [docs/08-build-packaging.md](docs/08-build-packaging.md) for full details.
+
+## Customizing (ricing)
+
+Everything lives under `~/.config/fang/`:
+
+| Path | What it does |
+|------|--------------|
+| `config.toml` | Settings — view defaults, behavior (click-to-open, type-ahead), shortcuts |
+| `themes/<name>.toml` | Your color/metric/font themes (select via `appearance.theme`) |
+| `icons/<name>.svg` | Override any file/folder icon by freedesktop icon name |
+| `actions.toml` | Custom context-menu actions with safe `%f/%F/%d/…` placeholders |
+| `ui/main.qml` | **Replace the entire UI** — Fang loads your QML instead of the bundled one |
+
+The complete guide, including the QML API you build against, is in
+**[docs/RICING.md](docs/RICING.md)** and [docs/04-qml-api.md](docs/04-qml-api.md).
 
 ## Documentation map
-
-Read the docs in order. Everything the implementation needs is specified there.
 
 | Doc | Contents |
 |-----|----------|
@@ -65,19 +81,8 @@ Read the docs in order. Everything the implementation needs is specified there.
 | [docs/04-qml-api.md](docs/04-qml-api.md) | The stable QML API contract + override & versioning mechanism |
 | [docs/05-default-ui.md](docs/05-default-ui.md) | Default QML UI spec: windows, panels, views, interactions, shortcuts |
 | [docs/06-config-theming.md](docs/06-config-theming.md) | `config.toml`, `theme`, `actions.toml`, `bookmarks` schemas |
+| [docs/RICING.md](docs/RICING.md) | **Customization guide** — UI overrides, themes, icons, actions |
 | [docs/07-features-roadmap.md](docs/07-features-roadmap.md) | v1 feature list + phased roadmap toward Dolphin parity |
 | [docs/08-build-packaging.md](docs/08-build-packaging.md) | CMake layout, build/run instructions, optional Nix flake |
 | [docs/09-testing.md](docs/09-testing.md) | Test plan and manual QA checklist |
-| [docs/10-repo-layout.md](docs/10-repo-layout.md) | Full directory tree of the target codebase |
-| [docs/PROMPT.md](docs/PROMPT.md) | **Master generation prompt** for Fable 5 (ties all docs together) |
-
-## Building (once generated)
-
-```sh
-cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Release
-cmake --build build
-./build/fang            # or: cmake --install build
-```
-
-See [docs/08-build-packaging.md](docs/08-build-packaging.md) for full details and
-NixOS instructions.
+| [docs/10-repo-layout.md](docs/10-repo-layout.md) | Full directory tree of the codebase |

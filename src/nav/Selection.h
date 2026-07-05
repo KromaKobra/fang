@@ -29,6 +29,7 @@ public:
     explicit Selection(DirectoryModel* model, QObject* parent = nullptr);
 
     int count() const { return int(m_paths.size()); }
+    DirectoryModel* model() const { return m_model; }
     bool hasSelection() const { return !m_paths.isEmpty(); }
     QList<QUrl> selectedUrls() const;
     QStringList selectedPaths() const;

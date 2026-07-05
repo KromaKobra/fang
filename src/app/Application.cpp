@@ -3,6 +3,7 @@
 #include "app/PaneController.h"
 #include "app/TabController.h"
 #include "app/WindowController.h"
+#include "config/ActionRegistry.h"
 #include "config/AppearancePortal.h"
 #include "config/ConfigStore.h"
 #include "config/Settings.h"
@@ -59,6 +60,8 @@ Application::Application(QObject* parent)
     m_engine = new FileOperationEngine(this);
     m_previews = new Previews(this);
     m_search = new SearchEngine(this);
+    m_actions = new ActionRegistry(this);
+    connect(m_actions, &ActionRegistry::error, this, &Application::error);
 
     if (QCoreApplication::instance())
         connect(QCoreApplication::instance(), &QCoreApplication::aboutToQuit, this,
@@ -368,7 +371,7 @@ void Application::reloadTheme()
 
 void Application::reloadActions()
 {
-    // Wired to ActionRegistry once available (stage 8).
+    m_actions->reload();
 }
 
 void Application::reloadConfig()

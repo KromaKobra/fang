@@ -8,9 +8,10 @@ FocusScope {
     id: root
     property PaneController pane: null
     property bool paneActive: true
-    // behavior.open_with (docs/06): "single" (default) opens on click,
-    // "double" flips to double-click-open / single-click-select.
-    property bool singleClickOpens: Application.settings.openWith !== "double"
+    // behavior.open_with (docs/06): "double" (default) opens on
+    // double-click/Enter and single click only selects (feeding the preview
+    // pane); "single" flips to click-to-open.
+    property bool singleClickOpens: Application.settings.openWith === "single"
     property int renameRow: -1
     readonly property var cutPaths: Application.clipboard.cutPaths
     signal activatedByUser()
@@ -20,6 +21,11 @@ FocusScope {
     signal requestDeletePermanently()
     /// Asks the window chrome to confirm a move-to-trash (confirm_trash=true).
     signal requestTrash()
+    /// Asks the window chrome to open the properties dialog for the
+    /// selection (or the current directory when nothing is selected).
+    signal requestProperties()
+    /// Asks the window chrome to open the Open With dialog for the selection.
+    signal requestOpenWith()
 
     readonly property var th: Application.theme
     readonly property var currentView: viewLoader.item

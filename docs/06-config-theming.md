@@ -52,8 +52,8 @@ preview_pane       = false        # open on start
 preview_pane_width = 280
 
 [behavior]
-open_with          = "single"     # single | double  (click to open)
-select_with        = "double"     # derived: opposite of open_with when single-open
+open_with          = "double"     # single | double  (clicks to open; double = click selects)
+select_with        = "single"     # derived: opposite of open_with
 type_ahead         = "filter"     # filter | jump
 drag_default       = "auto"       # auto | copy | move (auto = move same-fs, copy cross-fs)
 new_tab_position   = "after"      # after | end

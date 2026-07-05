@@ -1,7 +1,9 @@
 #include "IconResolver.h"
 
+#include "config/ConfigStore.h"
 #include "util/Logging.h"
 
+#include <QFileInfo>
 #include <QIcon>
 #include <QPainter>
 #include <QPainterPath>
@@ -12,6 +14,20 @@ void IconResolver::setIconTheme(const QString& themeName)
 {
     if (!themeName.isEmpty() && themeName != QLatin1String("auto"))
         QIcon::setThemeName(themeName);
+}
+
+QString IconResolver::userIconFile(const QString& iconName)
+{
+    // Reject names that could escape the icons dir ("../", absolute paths).
+    if (iconName.isEmpty() || iconName.contains(QLatin1Char('/')))
+        return {};
+    const QString base = ConfigStore::configDir() + QLatin1String("/icons/") + iconName;
+    for (const char* ext : {".svg", ".png"}) {
+        const QString candidate = base + QLatin1String(ext);
+        if (QFileInfo::exists(candidate))
+            return candidate;
+    }
+    return {};
 }
 
 QPixmap IconResolver::resolve(const QString& iconName, int size)
@@ -28,6 +44,14 @@ QPixmap IconResolver::resolve(const QString& iconName, int size)
           << QStringLiteral("unknown");
 
     for (const QString& name : std::as_const(chain)) {
+        // User overrides (ricing) win over the icon theme at every step of
+        // the fallback chain.
+        const QString userFile = userIconFile(name);
+        if (!userFile.isEmpty()) {
+            const QPixmap px = QIcon(userFile).pixmap(size, size);
+            if (!px.isNull())
+                return px;
+        }
         const QIcon icon = QIcon::fromTheme(name);
         if (!icon.isNull()) {
             const QPixmap px = icon.pixmap(size, size);
