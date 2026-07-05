@@ -3,6 +3,7 @@
 #include "app/Application.h"
 #include "app/WindowController.h"
 #include "fs/DirectoryModel.h"
+#include "config/Settings.h"
 #include "fs/MimeResolver.h"
 #include "nav/Navigation.h"
 #include "nav/Selection.h"
@@ -32,6 +33,22 @@ PaneController::PaneController(WindowController* window, QObject* parent)
     m_columnWidths.insert(QStringLiteral("size"), 90);
     m_columnWidths.insert(QStringLiteral("type"), 160);
     m_columnWidths.insert(QStringLiteral("modified"), 160);
+
+    // New panes start from the configured [view] defaults (docs/06).
+    if (Application::instance() && Application::instance()->settings()) {
+        const Settings* s = Application::instance()->settings();
+        m_viewMode = viewModeFromString(s->defaultMode());
+        m_iconSize = qBound(16, s->iconSize(), 256);
+        if (!s->columns().isEmpty())
+            m_columns = s->columns();
+        const QVariantMap widths = s->columnWidths();
+        for (auto it = widths.constBegin(); it != widths.constEnd(); ++it)
+            m_columnWidths.insert(it.key(), it.value());
+        m_model->setShowHidden(s->showHidden());
+        m_model->setFoldersFirst(s->foldersFirst());
+        m_model->setCaseSensitiveSort(s->caseSensitiveSort());
+        m_model->setSort(sortRoleFromString(s->sortRole()), s->sortDescending());
+    }
 
     connect(m_model, &DirectoryModel::loadingChanged, this, &PaneController::loadingChanged);
     connect(m_model, &DirectoryModel::countChanged, this, &PaneController::itemCountChanged);
@@ -291,6 +308,64 @@ void PaneController::renameAt(int row, const QString& newName)
     if (!fi)
         return;
     FileOperationEngine::instance()->rename(QUrl::fromLocalFile(fi->path), newName);
+}
+
+// ------------------------------------------------------ string conversions
+
+QString PaneController::viewModeToString(ViewMode mode)
+{
+    switch (mode) {
+    case ViewMode::Icons: return QStringLiteral("icons");
+    case ViewMode::List: return QStringLiteral("list");
+    case ViewMode::Details: return QStringLiteral("details");
+    case ViewMode::Tree: return QStringLiteral("tree");
+    }
+    return QStringLiteral("details");
+}
+
+ViewMode PaneController::viewModeFromString(const QString& s)
+{
+    if (s == QLatin1String("icons"))
+        return ViewMode::Icons;
+    if (s == QLatin1String("list"))
+        return ViewMode::List;
+    if (s == QLatin1String("tree"))
+        return ViewMode::Tree;
+    return ViewMode::Details;
+}
+
+QString PaneController::sortRoleToString(SortRole role)
+{
+    switch (role) {
+    case SortRole::ByName: return QStringLiteral("name");
+    case SortRole::BySize: return QStringLiteral("size");
+    case SortRole::ByType: return QStringLiteral("type");
+    case SortRole::ByModified: return QStringLiteral("modified");
+    case SortRole::ByCreated: return QStringLiteral("created");
+    case SortRole::ByAccessed: return QStringLiteral("accessed");
+    case SortRole::ByExtension: return QStringLiteral("extension");
+    case SortRole::ByOwner: return QStringLiteral("owner");
+    }
+    return QStringLiteral("name");
+}
+
+SortRole PaneController::sortRoleFromString(const QString& s)
+{
+    if (s == QLatin1String("size"))
+        return SortRole::BySize;
+    if (s == QLatin1String("type"))
+        return SortRole::ByType;
+    if (s == QLatin1String("modified"))
+        return SortRole::ByModified;
+    if (s == QLatin1String("created"))
+        return SortRole::ByCreated;
+    if (s == QLatin1String("accessed"))
+        return SortRole::ByAccessed;
+    if (s == QLatin1String("extension"))
+        return SortRole::ByExtension;
+    if (s == QLatin1String("owner"))
+        return SortRole::ByOwner;
+    return SortRole::ByName;
 }
 
 } // namespace fang

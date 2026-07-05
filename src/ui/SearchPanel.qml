@@ -30,6 +30,10 @@ Rectangle {
         q.caseSensitive = caseCheck.checked
         q.regex = regexCheck.checked
         q.includeHidden = hiddenCheck.checked
+        // Walk limits come from the [search] config group (docs/06).
+        q.followSymlinks = Application.settings.searchFollowSymlinks
+        q.maxDepth = Application.settings.searchMaxDepth
+        q.ignorePaths = Application.settings.searchIgnorePaths
         search.start(q)
     }
 
@@ -92,10 +96,18 @@ Rectangle {
         height: 22
         spacing: root.th.spacingLarge
 
-        C.Checkbox { id: contentCheck; text: "Search contents" }
+        C.Checkbox {
+            id: contentCheck
+            text: "Search contents"
+            checked: Application.settings.contentSearchDefault
+        }
         C.Checkbox { id: caseCheck; text: "Case sensitive" }
         C.Checkbox { id: regexCheck; text: "Regex" }
-        C.Checkbox { id: hiddenCheck; text: "Hidden files" }
+        C.Checkbox {
+            id: hiddenCheck
+            text: "Hidden files"
+            checked: !Application.settings.searchIgnoreHidden
+        }
 
         Text {
             anchors.verticalCenter: parent.verticalCenter

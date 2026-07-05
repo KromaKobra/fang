@@ -8,9 +8,9 @@ FocusScope {
     id: root
     property PaneController pane: null
     property bool paneActive: true
-    // v1 default: single-click opens (docs/05 interaction rules); flipped by
-    // behavior.open_with = "double".
-    property bool singleClickOpens: true
+    // behavior.open_with (docs/06): "single" (default) opens on click,
+    // "double" flips to double-click-open / single-click-select.
+    property bool singleClickOpens: Application.settings.openWith !== "double"
     property int renameRow: -1
     readonly property var cutPaths: Application.clipboard.cutPaths
     signal activatedByUser()
@@ -18,6 +18,8 @@ FocusScope {
     signal requestCreateFile()
     /// Asks the window chrome to confirm a permanent delete of the selection.
     signal requestDeletePermanently()
+    /// Asks the window chrome to confirm a move-to-trash (confirm_trash=true).
+    signal requestTrash()
 
     readonly property var th: Application.theme
     readonly property var currentView: viewLoader.item
@@ -89,6 +91,16 @@ FocusScope {
     }
 
     function trashSelection() {
+        if (!pane.selection.hasSelection)
+            return
+        if (Application.settings.confirmTrash)
+            requestTrash()
+        else
+            trashSelectionNow()
+    }
+
+    /// Move-to-trash without confirmation (the chrome confirmed already).
+    function trashSelectionNow() {
         if (pane.selection.hasSelection)
             pane.fileOperations.trash(pane.selection.selectedUrls)
     }
@@ -115,9 +127,9 @@ FocusScope {
 
     /// Shared drop policy (delegates, background, sidebar forwards here too):
     /// Shift-drags arrive as MoveAction and force a move; internal drags
-    /// default to auto (move on same device, copy across); external drops
-    /// copy. DragEvent exposes no modifiers in QML, so Ctrl-forced copies of
-    /// internal drags degrade to auto.
+    /// follow behavior.drag_default (auto = move on same device, copy
+    /// across); external drops copy. DragEvent exposes no modifiers in QML,
+    /// so Ctrl-forced copies of internal drags degrade to the default.
     function handleDrop(drop, destUrl) {
         const urls = drop.urls
         if (!urls || urls.length === 0)
@@ -128,12 +140,19 @@ FocusScope {
                 return // dropping something onto itself
         }
         const fo = pane.fileOperations
-        if (drop.proposedAction === Qt.MoveAction)
+        if (drop.proposedAction === Qt.MoveAction) {
             fo.move(urls, destUrl)
-        else if (drop.source)
-            fo.autoTransfer(urls, destUrl)
-        else
+        } else if (drop.source) {
+            const mode = Application.settings.dragDefault
+            if (mode === "copy")
+                fo.copy(urls, destUrl)
+            else if (mode === "move")
+                fo.move(urls, destUrl)
+            else
+                fo.autoTransfer(urls, destUrl)
+        } else {
             fo.copy(urls, destUrl)
+        }
         drop.acceptProposedAction()
     }
 
@@ -170,6 +189,25 @@ FocusScope {
     }
 
     // ------------------------------------------------------------- keyboard
+
+    // behavior.type_ahead = "jump": typed prefix selects the first matching
+    // name instead of feeding the filter; repeating a letter cycles.
+    property string jumpBuffer: ""
+    Timer { id: jumpReset; interval: 600; onTriggered: root.jumpBuffer = "" }
+
+    function jumpTo(ch) {
+        const sel = pane.selection
+        const cycling = jumpBuffer === "" && sel.current >= 0
+        jumpBuffer += ch
+        jumpReset.restart()
+        const from = cycling ? sel.current + 1 : Math.max(0, sel.current)
+        const row = pane.model.rowMatchingPrefix(jumpBuffer, from)
+        if (row >= 0) {
+            sel.select(row)
+            if (currentView && currentView.ensureVisible)
+                currentView.ensureVisible(row)
+        }
+    }
 
     function moveCurrent(delta, extendSelection) {
         const count = pane.itemCount
@@ -220,12 +258,16 @@ FocusScope {
         case Qt.Key_Backspace:
             pane.navigation.up(); ev.accepted = true; break
         case Qt.Key_Escape:
-            pane.filterText = ""; sel.clear(); ev.accepted = true; break
+            pane.filterText = ""; jumpBuffer = ""; sel.clear(); ev.accepted = true; break
         default:
-            // Type-to-filter: printable characters feed the live filter.
+            // Type-ahead: printable characters feed the live filter, or
+            // jump-select when behavior.type_ahead = "jump".
             if (ev.text.length === 1 && ev.text >= " " && !(ev.modifiers
                     & (Qt.ControlModifier | Qt.AltModifier | Qt.MetaModifier))) {
-                pane.filterText = pane.filterText + ev.text
+                if (Application.settings.typeAhead === "jump")
+                    jumpTo(ev.text)
+                else
+                    pane.filterText = pane.filterText + ev.text
                 ev.accepted = true
             }
         }

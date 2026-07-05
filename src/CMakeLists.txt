@@ -30,6 +30,9 @@ set(FANG_CORE_SOURCES
     search/SearchResultsModel.h search/SearchResultsModel.cpp
     search/SearchEngine.h search/SearchEngine.cpp
     config/Theme.h config/Theme.cpp
+    config/ConfigStore.h config/ConfigStore.cpp
+    config/Settings.h config/Settings.cpp
+    config/AppearancePortal.h config/AppearancePortal.cpp
     util/Enums.h
     util/HumanFormat.h util/HumanFormat.cpp
     util/Logging.h util/Logging.cpp

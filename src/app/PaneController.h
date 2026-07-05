@@ -100,6 +100,12 @@ public:
     /// (back/forward use this).
     void openWithoutHistory(const QString& path);
 
+    /// config/session string forms ("details", "name", ...) per docs/06.
+    static QString viewModeToString(ViewMode mode);
+    static ViewMode viewModeFromString(const QString& s);
+    static QString sortRoleToString(SortRole role);
+    static SortRole sortRoleFromString(const QString& s);
+
     WindowController* window() const { return m_window; }
 
 signals:

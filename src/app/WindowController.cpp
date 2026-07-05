@@ -1,7 +1,9 @@
 #include "WindowController.h"
 
+#include "app/Application.h"
 #include "app/PaneController.h"
 #include "app/TabController.h"
+#include "config/Settings.h"
 
 #include <QDir>
 
@@ -59,16 +61,21 @@ void WindowController::setSplitView(bool split)
 
 TabController* WindowController::addTab(const QString& path)
 {
-    const QString target = path.isEmpty() ? QDir::homePath() : path;
+    const Settings* settings =
+        Application::instance() ? Application::instance()->settings() : nullptr;
+    QString target = path;
+    if (target.isEmpty())
+        target = settings ? settings->defaultLocation() : QDir::homePath();
     auto* tab = new TabController(this, target, this);
     connect(tab, &TabController::splitViewChanged, this, [this, tab] {
         if (tab == activeTab())
             emit splitViewChanged();
     });
 
-    // Default policy "after": insert right of the active tab (docs/06
-    // behavior.new_tab_position; "end" appends).
-    const int insertAt = (m_activeTabIndex >= 0 && m_activeTabIndex < m_tabs.size())
+    // behavior.new_tab_position (docs/06): "after" inserts right of the
+    // active tab, "end" appends.
+    const bool atEnd = settings && settings->newTabPosition() == QLatin1String("end");
+    const int insertAt = (!atEnd && m_activeTabIndex >= 0 && m_activeTabIndex < m_tabs.size())
         ? m_activeTabIndex + 1
         : int(m_tabs.size());
     m_tabs.insert(insertAt, tab);

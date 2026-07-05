@@ -68,106 +68,60 @@ fails with `module "QtQuick.Controls.Basic" is not installed`.
   Builds clean with -Werror; runs on offscreen AND wayland with zero QML
   warnings; single Application instance verified.
 
+- **Stage 4 — DONE** (commit 8b61648). FileOperationEngine + workers
+  (copy/move/delete/trash/restore), TrashManager (freedesktop spec), UndoStack
+  (bounded 50, inverse ops with recording suppressed), Clipboard
+  (x-special/gnome-copied-files + uri-list, cut-dimming), ConflictDialog +
+  OperationOverlay + DnD (delegates/background/sidebar drops, modifier policy).
+- **Stage 5 — DONE** (commit c582f13). ThumbnailProvider ("fang-thumb"
+  QQuickAsyncImageProvider) + ThumbnailGenerator (freedesktop shared cache
+  ~/.cache/thumbnails/{normal,large}, Thumb::URI/MTime keys, EXIF
+  autotransform, pluggable registry, size cap + shared-cache statics),
+  Previews controller (fileDetails/isProbablyText/readTextPeek), PreviewPane
+  (image/text peek/icon+metadata), F11/F7 toggle.
+- **Stage 6 — DONE** (commit 3e2c586). SearchEngine (worker-thread manual
+  recursion, depth cap/ignore paths/hidden/symlink options, glob/substring/
+  regex names, content grep with binary skip + size cap, queued batches),
+  SearchQuery (QObject props), SearchResultsModel (DirectoryModel roles +
+  matchContext/parentDir), SearchPanel (Ctrl+F, results list, activate opens
+  containing dir + selects).
+- **Stage 7 — DONE** (this commit). config/ConfigStore (kept toml::table for
+  unknown-key-preserving round-trip, QSaveFile atomic writes, schema_version,
+  per-group change signals; stateDir = GenericStateLocation + "/fang" per
+  docs/06), config/Settings (typed props for every docs/06 key, per-group
+  notify + changed(), shortcut(name, fallback) invokable, notifyAllChanged()
+  for hot reload), Application.settings exposed; appearance wiring (theme
+  name/user themes dir/icon_theme → IconResolver, font override only when
+  keys explicitly set, follow_system → config/AppearancePortal reading
+  org.freedesktop.portal.Settings color-scheme + SettingChanged, portal only
+  instantiated while follow_system=true); previews wiring (enabled/images →
+  size-cap collapse, max_file_size_mb, use_shared_cache static, text_peek_kb
+  in PreviewPane); [view] defaults seed new PaneControllers; [behavior]:
+  open_with → FileView.singleClickOpens, type_ahead filter|jump (new additive
+  DirectoryModel.rowMatchingPrefix + jump buffer in FileView), drag_default
+  in handleDrop, new_tab_position + general.default_location in
+  WindowController::addTab, close_confirm_multiple_tabs popup in Main.qml;
+  confirm_delete/confirm_trash both flow through the (generalized)
+  deleteConfirm popup; [search] group feeds SearchPanel checkbox defaults +
+  query walk limits; Shortcuts.qml resolves every sequence via
+  settings.shortcut() with a keymapRevision re-bind trick; session.toml
+  save on clean exit / restore in newWindow (windows/tabs/panes: location,
+  view mode, sort, hidden, icon size, columns, split, active pane/tab,
+  window geometry via new additive WindowController.geometry QRect prop
+  mirrored by Main.qml); Application.reloadConfig() = disk reload +
+  notifyAllChanged.
+
 **App is in a user-testable state at this commit:** browse, tabs, split view,
-sidebar/places/bookmarks, all four view modes, sorting/columns, type-to-filter,
-hidden toggle, rename (F2), create folder/file, open files via default app,
-breadcrumb/location editing, zoom slider, toasts. NOT yet present (later
-stages): copy/move/trash/undo/paste/DnD (stage 4), thumbnails/preview pane
-(stage 5), search (stage 6), persisted settings/session (stage 7), custom
-actions/open-with/properties dialogs (stage 8), packaging files (stage 9),
-tests (stage 10).
+sidebar/places/bookmarks, all four view modes, sorting/columns, type-to-filter
+or type-to-jump, hidden toggle, rename (F2), create folder/file, open files
+via default app, breadcrumb/location editing, zoom slider, toasts,
+copy/move/trash/undo/redo/paste/DnD with conflict + progress UI, image
+thumbnails, preview pane, threaded search, full config.toml (live-persisted
+settings, shortcut remaps, themes incl. user themes + follow_system portal),
+session save/restore. NOT yet present: custom actions/open-with/properties
+dialogs (stage 8), packaging files (stage 9), tests (stage 10).
 
-## Stage 4 — DESIGN DECIDED, ready to implement
-
-`src/ops/Operation.h` is ALREADY WRITTEN (not yet in CMakeLists, so it does
-not affect the build): Operation QObject with the docs/04 property set, plus
-`OpControl` (shared control block: atomics for pause/cancel, QMutex +
-QWaitCondition conflict handshake with applyToAll cache) and `OpWorker` base
-(keepGoing() pause/cancel gate, blocking askConflict(), error collection).
-Write Operation.cpp to match, then the rest in this order:
-
-1. **TrashManager** (ops/TrashManager.{h,cpp}) — static methods, no QObject.
-   Read `$XDG_DATA_HOME` AT CALL TIME (tests set it inside QTemporaryDir so
-   the same-device home-trash path is taken). trashDirFor(path): compare
-   st_dev of path vs data home (deepest existing ancestor) → home Trash, else
-   $topdir/.Trash/$uid (validate sticky, non-symlink) or .Trash-$uid.
-   trashFile(): reserve unique name by O_EXCL create of info/<name>.trashinfo
-   (collisions: name.2, name.3 …), write `[Trash Info]` with URL-encoded Path
-   (QUrl::toPercentEncoding(path, "/")) + ISO DeletionDate, then rename into
-   files/. list(): parse info/*.trashinfo, corrupt → item flagged (never
-   crash); files/ entries without info → "unknown origin". restore(item,
-   overwrite): mkpath parent, rename back, remove info. emptyAll/removeItem.
-2. **CopyWorker** (+ MoveWorker as thin moveMode subclass, own file per
-   docs/10): enumerate pass (filesTotal/bytesTotal, no symlink follow), then
-   per top-level entry: conflict check at dest (askConflict; Overwrite:
-   replace — for dirs remove-then-copy; Skip; KeepBoth/Rename: uniqueName
-   "name (2)" before extension; Merge (dirs): recurse, per-file conflicts as
-   encountered). Streamed 1 MiB chunk copy with keepGoing() between chunks;
-   cancel mid-file removes the partial dest. Preserve permissions +
-   file times (QFile::setPermissions / setFileTime). Track EVERY created
-   path in order (undo of merge must delete only created files). Per-file
-   errors: collect + continue; all-failed → Failed, else Completed with
-   errorText summary. Move: same-device (st_dev compare) rename fast-path
-   per entry after conflict check; EXDEV/cross-device → copy+verify(size)+
-   delete-source, deleting a source entry only when its whole subtree copied
-   clean. Refuse dest inside source.
-3. **DeleteWorker** — modes {Remove, Trash, Restore} (keeps docs/10 file
-   list; trash/restore execution belongs to the removal family). Remove:
-   refuse "/" and mount roots (QStorageInfo(path).rootPath()==path);
-   bottom-up recursive delete with per-file progress. Trash: TrashManager::
-   trashFile per entry, undoData records (orig, filesPath, infoPath).
-   Restore: conflict flow when origin exists (Overwrite/Skip/KeepBoth).
-4. **UndoStack** (ops/UndoStack.{h,cpp}) — QML_ELEMENT UNCREATABLE, bounded
-   50. Record {OpType, text, QVariantMap data}. Data by type: copy {sources,
-   destDir, createdPaths}; move {pairs from→to} (undo groups pairs by source
-   parent, one engine op per group); rename {dir, oldName, newName}; trash
-   {items}; create {path}. undo(): pop, run inverse via engine with
-   recording SUPPRESSED, push onto redo stack when the inverse op finishes
-   OK (drop + notify on failure); m_busy guard ignores undo/redo while an
-   inverse op is in flight. undoText/redoText: "Undo Move (3 items)".
-5. **Clipboard** (ops/Clipboard.{h,cpp}) — wraps QGuiApplication::clipboard.
-   copy/cut write `x-special/gnome-copied-files` ("copy\n<url>\n…"/"cut\n…")
-   + text/uri-list + text/plain; parse on QClipboard::dataChanged →
-   hasFiles/mode/cutPaths (additive QStringList prop that FileView.cutPaths
-   binds to for cut-dimming). paste(destDir): Cut → engine move + clear;
-   Copy → engine copy; returns Operation*. copyText(str) additive invokable
-   for "Copy Path".
-6. **FileOperationEngine + FileOperations** (both classes in
-   FileOperationEngine.{h,cpp}; docs/10 lists no separate FileOperations
-   file). Engine: app singleton (C++ instance(), NOT a QML singleton), owns
-   QList<Operation*> (prune terminal ops beyond ~20, deleteLater after
-   operationsChanged), owns UndoStack + Clipboard. Per async op: new QThread,
-   worker moveToThread, queued connects worker→Operation slots
-   (progressed/conflictAsked/stateHint/done); done → record undo (unless
-   suppressed), thread quit + deleteLater. Engine connects op conflict →
-   conflictRequested(op, src, dest, info) and failures → Application::notify.
-   rename/createFolder/createFile are synchronous (Operation finishSync).
-   FileOperations: QML controller per pane (thin forwarder to the engine)
-   with the docs/04 method set + additive autoTransfer(urls, destDir) for
-   DnD "auto" (same st_dev → move, else copy) + operations list property
-   + forwarded conflictRequested/operationsChanged.
-7. **Wiring:** Application gains clipboard/undo Q_PROPERTYs (engine-owned).
-   PaneController gains fileOperations property; route createFolder/
-   createFile/renameAt through the engine so they undo. FileView.cutPaths:
-   bind Application.clipboard.cutPaths. ContextMenu stage-4 items: Cut/Copy/
-   Copy Path/Paste(-into)/Move to Trash/Delete + background Paste. Shortcuts:
-   Ctrl+C/X/V, Del (trash), Shift+Del (confirm popup, permanent), Ctrl+Z,
-   Ctrl+Shift+Z. Toolbar menu: Undo/Redo entries with undoText/redoText.
-8. **QML:** ConflictDialog.qml (modal; both files' name/size/mtime; buttons
-   Overwrite/Skip/Keep Both/Rename/Merge-if-dir; apply-to-all Checkbox →
-   op.resolveConflict; opened from MainWindow Connections on
-   pane.fileOperations.conflictRequested). OperationOverlay.qml (bottom-right
-   stacked cards over pane.fileOperations.operations: type, progress bar,
-   speed/ETA via Application.formatSize, pause/resume/cancel; show
-   non-terminal + briefly-completed). RenameEditor.qml: extract the inline
-   editor from FileDelegate (keep FileDelegate's behavior identical, it just
-   instantiates RenameEditor). DnD: FileDelegate drag via proxy Item with
-   Drag.dragType: Drag.Automatic + Drag.mimeData {"text/uri-list": …} using
-   the full selection; DropArea on FileView background (→ pane.location),
-   on dir delegates (→ that dir), on Sidebar PlaceRow (→ place url);
-   modifiers: Ctrl → copy, Shift → move, none → autoTransfer.
-
-Then stages 5–10 per the plan below.
+## Next: stages 8–10 per the plan below.
 
 ## Key architecture decisions (verified compiling/working)
 
@@ -219,38 +173,8 @@ Then stages 5–10 per the plan below.
   by having each tab page push it on visibility/active-pane change — Repeater
   itemAt() is not reactive, don't try to bind through it.
 
-## Remaining stages 5–10 — plan + decisions already made
+## Remaining stages 8–10 — plan + decisions already made
 
-- **Stage 5 previews:** preview/{ThumbnailProvider,ThumbnailGenerator}.
-  QQuickAsyncImageProvider ("fang-thumb") + freedesktop cache
-  $XDG_CACHE_HOME/thumbnails/{normal,large}/<md5(file-uri)>.png with Thumb::URI/
-  Thumb::MTime keys (QImage text()); EXIF via QImageReader
-  setAutoTransform(true); size cap from config; PreviewPane.qml (image/text
-  peek via new Previews controller invokable readTextPeek(path, maxKb) —
-  Previews controller listed in docs/01; expose on Application or pane).
-  F11 toggles.
-- **Stage 6 search:** search/{SearchEngine,SearchResultsModel,SearchQuery}.
-  SearchQuery Q_GADGET value or QObject with props; worker thread walk
-  (QDirIterator manual recursion, depth cap, ignore_paths, hidden toggle),
-  name glob/substring/regex + content grep (null-byte binary skip + size cap),
-  streams via queued batches; Search controller on Application.search;
-  SearchPanel.qml + FileView shows results model (pane switches model? simplest:
-  SearchPanel lists results in its own view using same delegates or a plain
-  list; activate -> open containing dir/select).
-- **Stage 7 config:** config/{ConfigStore,Settings}. toml++ round-trip
-  (keep parsed toml::table, mutate + rewrite via QSaveFile), schema_version=1;
-  Settings typed props for every key in docs/06 §config.toml with per-group
-  change signals + persistence; Theme picks appearance.* (icon_theme →
-  IconResolver::setIconTheme, font override, theme name, follow_system →
-  config/AppearancePortal (org.freedesktop.portal.Settings Read color-scheme
-  + SettingChanged listener; only active when follow_system)). Shortcuts.qml:
-  central Shortcut map reading Settings shortcut overrides ([shortcuts] table).
-  session.toml save on exit (Application::saveSession serializing windows/tabs/
-  panes: geometry, locations, viewMode, sort, columns, split, active) +
-  restore in newWindow when general.restore_session and no CLI paths.
-  Settings.open_with single/double → FileView.singleClickOpens;
-  view defaults (mode/sort/columns/hidden/icon_size) → new panes;
-  behavior.new_tab_position → WindowController.addTab.
 - **Stage 8 actions:** config/{ActionRegistry,ActionParser} + util/ShellQuote.
   ShellQuote::quote(str) POSIX single-quote escaping ('\'' pattern);
   expand %f %F %u %U %d %n %% per docs/06 (each path individually quoted;
@@ -310,3 +234,15 @@ Then stages 5–10 per the plan below.
 - fang.* logging categories default QtWarningMsg; enable with
   QT_LOGGING_RULES="fang.*=true" (+ QT_FORCE_STDERR_LOGGING=1 on this host).
 - flake.lock is gitignored intentionally (registry override workflow).
+- This host's toml++ is built WITH exceptions: `toml::parse` throws
+  `toml::parse_error` and there is no `toml::parse_result` — wrap in
+  try/catch, do not use the `if (!result)` pattern from the docs.
+- QStandardPaths::StateLocation appends org+app ("…/state/KromaKobra/Fang");
+  docs/06 fixes the path as $XDG_STATE_HOME/fang → use GenericStateLocation
+  + "/fang" (ConfigStore::stateDir).
+- session.toml is written from QCoreApplication::aboutToQuit — a `timeout`-
+  killed run (SIGTERM) never fires it, so headless session tests must quit
+  cleanly (e.g. a UI override with a Timer calling Application.quit()).
+- Q_INVOKABLE results don't create binding dependencies: Shortcuts.qml keeps
+  a keymapRevision int bumped from onShortcutsChanged and reads it inside
+  key() so sequence bindings re-evaluate on config reload.

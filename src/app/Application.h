@@ -14,14 +14,18 @@ Q_MOC_INCLUDE("ops/Clipboard.h")
 Q_MOC_INCLUDE("ops/UndoStack.h")
 Q_MOC_INCLUDE("preview/Previews.h")
 Q_MOC_INCLUDE("search/SearchEngine.h")
+Q_MOC_INCLUDE("config/Settings.h")
 
 namespace fang {
 
+class AppearancePortal;
 class Clipboard;
+class ConfigStore;
 class FileOperationEngine;
 class Places;
 class Previews;
 class SearchEngine;
+class Settings;
 class Theme;
 class UndoStack;
 class WindowController;
@@ -36,6 +40,7 @@ class Application : public QObject {
     Q_PROPERTY(int apiVersion READ apiVersion CONSTANT)
     Q_PROPERTY(QString appVersion READ appVersion CONSTANT)
     Q_PROPERTY(fang::Theme* theme READ theme NOTIFY themeChanged)
+    Q_PROPERTY(fang::Settings* settings READ settings CONSTANT)
     Q_PROPERTY(fang::Places* places READ places CONSTANT)
     Q_PROPERTY(fang::Clipboard* clipboard READ clipboard CONSTANT)
     Q_PROPERTY(fang::UndoStack* undo READ undo CONSTANT)
@@ -61,6 +66,8 @@ public:
     int apiVersion() const { return 1; }
     QString appVersion() const;
     Theme* theme() const { return m_theme; }
+    Settings* settings() const { return m_settings; }
+    ConfigStore* configStore() const { return m_config; }
     Places* places() const { return m_places; }
     Clipboard* clipboard() const;
     UndoStack* undo() const;
@@ -90,6 +97,11 @@ public:
     Q_INVOKABLE void reloadActions();
     Q_INVOKABLE void reloadConfig();
 
+    /// session.toml write/restore (docs/06); saved on clean exit while
+    /// general.restore_session is on.
+    void saveSession();
+    bool restoreSessionInto(WindowController* win);
+
 signals:
     void themeChanged();
     void configReloaded();
@@ -97,8 +109,15 @@ signals:
     void overrideErrorChanged();
 
 private:
+    void applyAppearance();
+    void applyPreviewSettings();
+
     static Application* s_instance;
 
+    ConfigStore* m_config = nullptr;
+    Settings* m_settings = nullptr;
+    AppearancePortal* m_portal = nullptr;
+    int m_restoredWindows = 0;
     Theme* m_theme = nullptr;
     Places* m_places = nullptr;
     FileOperationEngine* m_engine = nullptr;

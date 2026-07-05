@@ -89,6 +89,10 @@ public:
     Q_INVOKABLE QString pathAt(int row) const;
     /// Whether the top-level row is a directory (additive to API v1).
     Q_INVOKABLE bool isDirAt(int row) const;
+    /// First top-level row at/after `fromRow` (wrapping) whose name starts
+    /// with `prefix`, case-insensitively; -1 when none. Additive to API v1;
+    /// backs behavior.type_ahead = "jump".
+    Q_INVOKABLE int rowMatchingPrefix(const QString& prefix, int fromRow = 0) const;
     int rowOf(const QString& path) const;
     /// dataChanged for SelectedRole across everything (called by Selection).
     void notifySelectionChanged();

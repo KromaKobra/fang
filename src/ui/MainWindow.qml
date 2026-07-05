@@ -17,8 +17,10 @@ Rectangle {
     property var currentFileView: null
 
     property real sidebarW: th.sidebarWidth
-    property bool previewVisible: false
-    property real previewW: 280
+    // view.preview_pane / preview_pane_width give the startup state (docs/06);
+    // F11 and the splitter take over from there.
+    property bool previewVisible: Application.settings.previewPane
+    property real previewW: Application.settings.previewPaneWidth
     property bool searchVisible: false
 
     function toggleSearch() {
@@ -168,6 +170,7 @@ Rectangle {
                         onRequestCreateFolder: createDialog.openFor("folder")
                         onRequestCreateFile: createDialog.openFor("file")
                         onRequestDeletePermanently: deleteConfirm.openFor(leftView)
+                        onRequestTrash: deleteConfirm.openForTrash(leftView)
 
                         // Active-pane accent border (only meaningful in split).
                         Rectangle {
@@ -208,6 +211,7 @@ Rectangle {
                             onRequestCreateFolder: createDialog.openFor("folder")
                             onRequestCreateFile: createDialog.openFor("file")
                             onRequestDeletePermanently: deleteConfirm.openFor(rightView)
+                            onRequestTrash: deleteConfirm.openForTrash(rightView)
 
                             Rectangle {
                                 anchors.fill: parent
@@ -260,10 +264,11 @@ Rectangle {
         z: 50
     }
 
-    // Permanent-delete confirmation (Shift+Del / context menu).
+    // Delete/trash confirmation (Shift+Del, Del with confirm_trash, menu).
     C.Popup {
         id: deleteConfirm
         property var fileView: null
+        property bool trashMode: false
         modal: true
         anchors.centerIn: parent
         contentWidth: 360
@@ -272,7 +277,21 @@ Rectangle {
         function openFor(fv) {
             if (!fv || !fv.pane || !fv.pane.selection.hasSelection)
                 return
+            // general.confirm_delete = false skips straight to the delete.
+            if (!Application.settings.confirmDelete) {
+                fv.deleteSelectionNow()
+                return
+            }
             fileView = fv
+            trashMode = false
+            open()
+        }
+
+        function openForTrash(fv) {
+            if (!fv || !fv.pane || !fv.pane.selection.hasSelection)
+                return
+            fileView = fv
+            trashMode = true
             open()
         }
 
@@ -282,7 +301,7 @@ Rectangle {
             spacing: root.th.spacingMedium
 
             Text {
-                text: "Delete permanently?"
+                text: deleteConfirm.trashMode ? "Move to trash?" : "Delete permanently?"
                 color: root.th.foreground
                 font.family: root.th.fontFamily
                 font.pointSize: root.th.fontSizeLarge
@@ -293,8 +312,10 @@ Rectangle {
                 text: {
                     const n = deleteConfirm.fileView
                             ? deleteConfirm.fileView.pane.selection.count : 0
-                    return (n === 1 ? "1 item" : n + " items")
-                        + " will be deleted permanently. This cannot be undone."
+                    const items = n === 1 ? "1 item" : n + " items"
+                    return deleteConfirm.trashMode
+                        ? items + " will be moved to the trash."
+                        : items + " will be deleted permanently. This cannot be undone."
                 }
                 color: root.th.foregroundMuted
                 font.family: root.th.fontFamily
@@ -309,10 +330,13 @@ Rectangle {
                     onClicked: deleteConfirm.close()
                 }
                 C.Button {
-                    text: "Delete"
+                    text: deleteConfirm.trashMode ? "Move to Trash" : "Delete"
                     accent: true
                     onClicked: {
-                        deleteConfirm.fileView.deleteSelectionNow()
+                        if (deleteConfirm.trashMode)
+                            deleteConfirm.fileView.trashSelectionNow()
+                        else
+                            deleteConfirm.fileView.deleteSelectionNow()
                         deleteConfirm.close()
                     }
                 }

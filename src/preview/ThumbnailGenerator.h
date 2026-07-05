@@ -42,6 +42,11 @@ public:
     /// previews.max_file_size_mb; wired from Settings in stage 7.
     static void setMaxFileSizeBytes(qint64 bytes);
     static qint64 maxFileSizeBytes();
+
+    /// previews.use_shared_cache: when false, getOrCreate neither reads nor
+    /// writes ~/.cache/thumbnails and always generates fresh.
+    static void setUseSharedCache(bool use);
+    static bool useSharedCache();
 };
 
 } // namespace fang

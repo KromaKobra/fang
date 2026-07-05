@@ -27,6 +27,7 @@ struct Generator {
 QMutex g_registryMutex;
 QList<Generator>* g_registry = nullptr;
 std::atomic<qint64> g_maxFileSize{qint64(64) * 1024 * 1024};
+std::atomic<bool> g_useSharedCache{true};
 
 QImage generateImageThumb(const QString& absPath, int px)
 {
@@ -159,6 +160,8 @@ QImage ThumbnailGenerator::generate(const QString& absPath, SizeClass size)
 
 QImage ThumbnailGenerator::getOrCreate(const QString& absPath, SizeClass size)
 {
+    if (!g_useSharedCache.load())
+        return generate(absPath, size);
     QImage cached = loadCached(absPath, size);
     if (!cached.isNull())
         return cached;
@@ -177,6 +180,16 @@ void ThumbnailGenerator::registerGenerator(const QString& mimePattern, GenerateF
 void ThumbnailGenerator::setMaxFileSizeBytes(qint64 bytes)
 {
     g_maxFileSize.store(bytes);
+}
+
+void ThumbnailGenerator::setUseSharedCache(bool use)
+{
+    g_useSharedCache.store(use);
+}
+
+bool ThumbnailGenerator::useSharedCache()
+{
+    return g_useSharedCache.load();
 }
 
 qint64 ThumbnailGenerator::maxFileSizeBytes()

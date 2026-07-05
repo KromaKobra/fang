@@ -510,6 +510,20 @@ bool DirectoryModel::isDirAt(int row) const
     return fi && fi->isDir;
 }
 
+int DirectoryModel::rowMatchingPrefix(const QString& prefix, int fromRow) const
+{
+    const int count = int(m_root->visible.size());
+    if (count == 0 || prefix.isEmpty())
+        return -1;
+    const int start = qBound(0, fromRow, count - 1);
+    for (int i = 0; i < count; ++i) {
+        const int row = (start + i) % count;
+        if (m_root->visible[size_t(row)]->info.name.startsWith(prefix, Qt::CaseInsensitive))
+            return row;
+    }
+    return -1;
+}
+
 int DirectoryModel::rowOf(const QString& path) const
 {
     for (size_t i = 0; i < m_root->visible.size(); ++i)

@@ -37,7 +37,8 @@ Rectangle {
         details = Application.previews.fileDetails(currentPath)
         if (!details.isDir && !details.isImage
                 && Application.previews.isProbablyText(currentPath))
-            textPeek = Application.previews.readTextPeek(currentPath, 128)
+            textPeek = Application.previews.readTextPeek(currentPath,
+                                                         Application.settings.textPeekKb)
         else
             textPeek = ""
     }
