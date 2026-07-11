@@ -14,6 +14,8 @@
 <b>A lightweight, fully customizable file manager for Linux</b>
 </div>
 
+<br>
+
 <img width="2420" height="1522" alt="Image" src="https://github.com/user-attachments/assets/839d1be8-1268-4af9-b791-e4a6fd0656bf" />
 
 ## What Fang is
