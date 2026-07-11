@@ -55,6 +55,12 @@ cmake --install build --prefix ~/.local
 Debug logging: `QT_LOGGING_RULES="fang.*=true" ./build/src/fang`.
 Force Wayland: `QT_QPA_PLATFORM=wayland ./build/src/fang`.
 
+## Quick run on NixOS
+```sh
+nix develop --override-input nixpkgs flake:nixpkgs --no-write-lock-file \
+  -c bash -c 'cmake -B build -G Ninja && cmake --build build && ./build/src/fang ~'
+```
+
 ## Desktop integration files
 
 - `dev.kromakobra.Fang.desktop` — `Categories=System;FileManager;Utility;`,

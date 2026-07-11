@@ -1,17 +1,20 @@
-# Fang
+<h1 align=center>Fang</h1>
 
-**A lightweight, fully customizable file manager for Linux, built on Qt 6 + QML.**
+<div align=center>
 
-- **By:** Kroma Kobra
-- **Type:** Desktop file manager (Wayland-first)
-- **License:** GPL-3.0-or-later
-- **Status:** Working v1. Browse, tabs, split view, four view modes, threaded
-  copy/move/trash with conflict handling and multi-level undo, freedesktop trash,
-  clipboard + drag-and-drop, image thumbnails, preview pane, recursive search,
-  custom context-menu actions, open-with/properties dialogs, full TOML config +
-  theming, session restore, and a wholesale-replaceable QML UI.
+![GitHub last commit](https://img.shields.io/github/last-commit/KromaKobra/fang?style=for-the-badge&labelColor=101418&color=9ccbfb)
+![GitHub Repo stars](https://img.shields.io/github/stars/KromaKobra/fang?style=for-the-badge&labelColor=101418&color=b9c8da)
+![GitHub repo size](https://img.shields.io/github/repo-size/KromaKobra/fang?style=for-the-badge&labelColor=101418&color=d3bfe6)
+[![Ko-Fi donate](https://img.shields.io/badge/donate-kofi?style=for-the-badge&logo=ko-fi&logoColor=ffffff&label=ko-fi&labelColor=101418&color=f16061&link=https%3A%2F%2Fko-fi.com%2Fkromakobra)](https://ko-fi.com/kromakobra)
+[![Discord invite](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fdiscordapp.com%2Fapi%2Finvites%2FsGgZGGggmE%3Fwith_counts%3Dtrue&query=approximate_member_count&style=for-the-badge&logo=discord&logoColor=ffffff&label=discord&labelColor=101418&color=96f1f1&link=https%3A%2F%2Fdiscord.gg%2sGgZGGggmE)](https://discord.gg/sGgZGGggmE)
 
----
+</div>
+
+<div align=center>
+<b>A lightweight, fully customizable file manager for Linux</b>
+</div>
+
+https://github.com/user-attachments/assets/839d1be8-1268-4af9-b791-e4a6fd0656bf
 
 ## What Fang is
 
